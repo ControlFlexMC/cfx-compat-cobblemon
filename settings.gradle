@@ -1,0 +1,23 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven {
+            name = 'FabricMC'
+            url = 'https://maven.fabricmc.net/'
+        }
+    }
+
+    plugins {
+        id 'fabric-loom' version '1.7-SNAPSHOT'
+        id 'net.neoforged.moddev' version '2.0.141'
+    }
+}
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+}
+
+// 1.21.1 has no Forge: Fabric and NeoForge are the two loaders on this branch.
+include 'fabric', 'neoforge'
+
+rootProject.name = 'cfx-compat-cobblemon'
