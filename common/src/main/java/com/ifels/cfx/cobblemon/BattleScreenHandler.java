@@ -71,6 +71,11 @@ public final class BattleScreenHandler implements IScreenHandler {
             return false;
         }
         boolean switched = BattleScreen.back(screen, selection);
+        if (switched) {
+            // Cobblemon rebuilds the menu from scratch after this, so tell the highlight which
+            // tile it should land on instead of letting a fresh page object reset it to "Fight".
+            BattleSelection.INSTANCE.markReturnToMenu();
+        }
         LOGGER.info("[cfx-compat-cobblemon] B from {} -> {}",
                 selection.getClass().getSimpleName(), switched ? "action menu" : "no handler");
         return switched;
@@ -84,13 +89,9 @@ public final class BattleScreenHandler implements IScreenHandler {
 
     @Override
     public boolean onHudState(boolean visible, HudStateReason reason) {
+        // The toggle is its own feedback: badges, ring and page hint disappear, and the dimmed
+        // bottom-left key hint stays as the way back. No extra toast.
         BattleHud.setVisible(visible);
-        if (reason == HudStateReason.USER_TOGGLE) {
-            // Only a press deserves feedback; the restore on screen-open must stay silent.
-            // Drawn by our own HUD: the vanilla action bar lands between the tiles and the
-            // message box on this screen, where the text is unreadable.
-            BattleHud.flashToggle(visible);
-        }
         return true;
     }
 }

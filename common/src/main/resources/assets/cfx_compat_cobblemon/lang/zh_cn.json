@@ -19,7 +19,5 @@
   "key.cfx_compat_cobblemon.battle_log_up": "战斗记录上滚",
   "key.cfx_compat_cobblemon.battle_log_down": "战斗记录下滚",
   "cfx_compat_cobblemon.hud.prev_next": "切换选项",
-  "cfx_compat_cobblemon.hud.on": "操作提示：显示",
-  "cfx_compat_cobblemon.hud.off": "操作提示：隐藏",
   "cfx_compat_cobblemon.hud.toggle": "操作提示"
 }

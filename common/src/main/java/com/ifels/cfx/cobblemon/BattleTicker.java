@@ -40,11 +40,13 @@ public final class BattleTicker {
         Screen screen = mc.screen;
 
         if (screen == null || BattleKeys.isEmpty()) {
+            BattleSelection.INSTANCE.reset();
             BattleKeys.drainAll();
             return;
         }
 
         if (!BattleScreen.isBattleScreen(screen)) {
+            BattleSelection.INSTANCE.reset();
             BattleKeys.drainAll();
             return;
         }
@@ -63,8 +65,9 @@ public final class BattleTicker {
         }
 
         List<BattleScreen.Slot> slots = BattleScreen.slots(selection);
+        boolean rootMenu = BattleScreen.kindOf(selection) == BattleScreen.PageKind.ROOT;
         if (slots.isEmpty()) {
-            BattleSelection.INSTANCE.sync(selection, 0);
+            BattleSelection.INSTANCE.sync(selection, 0, rootMenu);
             parkedOn = null;
             BattleKeys.drainAll();
             return;
@@ -73,7 +76,7 @@ public final class BattleTicker {
         // LB/RB walk the highlight; confirm activates whatever it is on. Direct per-tile bindings
         // still work and drag the highlight along, so the two input styles stay consistent.
         BattleSelection selectionState = BattleSelection.INSTANCE;
-        selectionState.sync(selection, slots.size());
+        selectionState.sync(selection, slots.size(), rootMenu);
 
         // A page that just appeared starts with the highlight on tile 0, so the pointer starts
         // there too — one tick after the page mounts, before the player can press anything.

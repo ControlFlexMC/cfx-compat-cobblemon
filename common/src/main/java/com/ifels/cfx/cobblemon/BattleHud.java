@@ -42,10 +42,6 @@ public final class BattleHud {
 
     private static boolean diagnosed;
     private static boolean visible = true;
-    /** Transient confirmation for the HUD toggle. Drawn here, not through the vanilla action bar. */
-    private static final long TOAST_MS = 1400;
-    private static long toastAt;
-    private static boolean toastVisible;
     /** Page + index the ring was last logged for, so the log stays at one line per target. */
     private static Object loggedHighlightPage;
     private static int loggedHighlightIndex = -1;
@@ -70,16 +66,15 @@ public final class BattleHud {
 
         // Diagnostics run even while hidden, so a report still shows whether bindings resolved.
         diagnoseOnce(provider, slots);
-        // The toggle confirmation must survive hiding itself: draw it before the visibility gate.
-        drawToggleToast(graphics, screen);
-        // Deliberately before the gate too: this is the way back when the hints are off, so it
-        // stays on screen (dimmed) instead of vanishing with everything else.
+        // Deliberately before the gate: this is the way back when the hints are off, so it stays
+        // on screen (dimmed) instead of vanishing with everything else.
         drawHudToggleHint(graphics, screen, provider);
         if (!visible) {
             return;
         }
 
-        int selected = BattleSelection.INSTANCE.sync(selection, slots.size());
+        int selected = BattleSelection.INSTANCE.sync(selection, slots.size(),
+                kind == BattleScreen.PageKind.ROOT);
         if (selected >= 0 && selected < slots.size()) {
             drawHighlight(graphics, HudLayout.highlightFor(slots.get(selected), kind), selection, selected);
         }
@@ -278,30 +273,6 @@ public final class BattleHud {
             graphics.drawString(mc.font, label, cursor, y + 1,
                     visible ? NAV_TEXT : NAV_TEXT_OFF, false);
         }
-    }
-
-    /** Called by the screen handler on a real press, so the player sees the toggle land. */
-    public static void flashToggle(boolean shown) {
-        toastVisible = shown;
-        toastAt = System.currentTimeMillis();
-    }
-
-    /**
-     * One line just above the page-navigation hint — the only area this page leaves free at the
-     * bottom. Drawn in the HUD's own pass rather than through the vanilla action bar, whose fixed
-     * position lands between the option tiles and the message box here.
-     */
-    private static void drawToggleToast(GuiGraphics graphics, Screen screen) {
-        if (toastAt == 0 || System.currentTimeMillis() - toastAt > TOAST_MS) {
-            return;
-        }
-        Minecraft mc = Minecraft.getInstance();
-        Component text = Component.translatable(toastVisible
-                ? "cfx_compat_cobblemon.hud.on"
-                : "cfx_compat_cobblemon.hud.off");
-        int x = screen.width - NAV_MARGIN - mc.font.width(text);
-        int y = screen.height - NAV_MARGIN - HudLayout.GLYPH_SIZE - 10;
-        graphics.drawString(mc.font, text, x, y, NAV_TEXT, true);
     }
 
     private static List<IControllerGlyph> glyphsOf(IActionBindingProvider provider, BattleAction action) {
