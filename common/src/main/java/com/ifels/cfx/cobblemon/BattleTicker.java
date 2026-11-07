@@ -44,12 +44,6 @@ public final class BattleTicker {
             return;
         }
 
-        // Handled outside the battle-screen gate: the overlay can be switched off (or back on)
-        // from any screen, and the choice carries into the next battle.
-        if (consume(BattleAction.HUD_TOGGLE)) {
-            BattleHud.toggle();
-        }
-
         if (!BattleScreen.isBattleScreen(screen)) {
             BattleKeys.drainAll();
             return;

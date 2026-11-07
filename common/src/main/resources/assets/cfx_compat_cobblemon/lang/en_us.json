@@ -18,7 +18,8 @@
   "key.cfx_compat_cobblemon.battle_next": "Next Option",
   "key.cfx_compat_cobblemon.battle_log_up": "Log Scroll Up",
   "key.cfx_compat_cobblemon.battle_log_down": "Log Scroll Down",
-  "key.cfx_compat_cobblemon.battle_hud_toggle": "Toggle Key Hints",
+  "cfx_compat_cobblemon.hud.prev_next": "switch",
   "cfx_compat_cobblemon.hud.on": "Key hints: shown",
-  "cfx_compat_cobblemon.hud.off": "Key hints: hidden"
+  "cfx_compat_cobblemon.hud.off": "Key hints: hidden",
+  "cfx_compat_cobblemon.hud.toggle": "Hints"
 }

@@ -41,15 +41,11 @@ public enum BattleAction {
     NEXT("battle_next"),
 
     LOG_UP("battle_log_up"),
-    LOG_DOWN("battle_log_down"),
+    LOG_DOWN("battle_log_down");
 
-    /**
-     * Show or hide the key hint overlay.
-     *
-     * <p>Not a tile action: it is handled before the battle-screen gate, so it also works from
-     * any other screen (the overlay state carries into the next battle).</p>
-     */
-    HUD_TOGGLE("battle_hud_toggle");
+    // Note: there is deliberately no hud-toggle action here. ControlFlex ships a built-in
+    // cross-phase hud_toggle (API 0.13.0) and BattleScreenHandler receives the state it
+    // pushes — one binding for every bridge instead of one action per bridge.
 
     public static final String MOD_ID = "cfx_compat_cobblemon";
     public static final String CATEGORY = "category.cfx_compat_cobblemon.battle";

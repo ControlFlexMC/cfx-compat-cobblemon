@@ -11,7 +11,7 @@ MC 1.21.1, Fabric and NeoForge, requires ControlFlex API 0.12.0 or newer.
 
 ## Actions
 
-All 19 actions live in `category.cfx_compat_cobblemon.battle` and are unbound by default; bind them
+All 18 actions live in `category.cfx_compat_cobblemon.battle` and are unbound by default; bind them
 under ControlFlex → Mods → Cobblemon → Battle.
 
 | Group | Actions | Fires on |
@@ -21,10 +21,13 @@ under ControlFlex → Mods → Cobblemon → Battle.
 | Party | `battle_party_1` … `battle_party_6` | party page, including forced switches |
 | Navigation | `battle_prev` / `battle_next` | any sub-page: walks the highlight and parks the cursor |
 | Log | `battle_log_up` / `battle_log_down` | any time the battle screen is open |
-| Overlay | `battle_hud_toggle` | any screen |
 
-Back is not an action: the bridge registers a GUI back handler for `BattleGUI`, so the built-in back
-button steps one page out (move/party → action menu) and only minimises at the root.
+Back is not an action either: the bridge registers a screen handler for `BattleGUI`, so the built-in
+back button steps one page out (move/party → action menu) and only minimises at the root.
+
+Showing or hiding the hints uses ControlFlex's own built-in `hud_toggle` action (0.13.0), not an
+action of ours — one binding works for every bridge. Its state is stored by ControlFlex per screen
+class, so the choice survives leaving the battle and restarting the game.
 
 ## How it works
 

@@ -39,6 +39,6 @@ public final class CfxCobblemonPlugin implements IControlFlexPlugin {
         LOGGER.info("[cfx-compat-cobblemon] ControlFlex ready; {} battle actions available",
                 BattleAction.values().length);
         // The only point where ControlFlex has certainly published its API registries.
-        BattleBackHandler.register();
+        BattleScreenHandler.register();
     }
 }

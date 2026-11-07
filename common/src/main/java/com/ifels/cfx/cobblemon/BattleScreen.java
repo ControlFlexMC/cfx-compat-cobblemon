@@ -39,7 +39,16 @@ public final class BattleScreen {
     }
 
     /** One clickable tile in the sub-page that is open right now. */
-    public record Slot(BattleAction action, float x, float y, float width, float height, int row) {
+    /**
+     * One clickable tile in the sub-page that is open right now.
+     *
+     * <p>{@code labelWidth} is the rendered width of the tile's own label in GUI pixels, or 0 when
+     * the page has none. The HUD uses it to decide whether a key badge fits between the label and
+     * the artwork on the right: the action menu draws its label at a fixed offset, so how much room
+     * is actually free depends on the language.</p>
+     */
+    public record Slot(BattleAction action, float x, float y, float width, float height, int row,
+                       int labelWidth) {
         public double centerX() {
             return x + width / 2.0;
         }
@@ -120,9 +129,25 @@ public final class BattleScreen {
                 continue;
             }
             out.add(new Slot(action, num(invoke(tile, "getX")), num(invoke(tile, "getY")),
-                    ROOT_W, ROOT_H, i / 2));
+                    ROOT_W, ROOT_H, i / 2, labelWidth(tile)));
         }
         return out;
+    }
+
+    /**
+     * Width of a root tile's label, or 0 when it cannot be read.
+     *
+     * <p>{@code BattleOptionTile} draws the label with the vanilla font at scale 1, so
+     * {@code font.width(text)} is exactly the advance it consumes. Reading it is what lets the
+     * badge sit inside on short labels and fall back outside on long ones (German
+     * {@code "Auswechseln"} leaves no room).</p>
+     */
+    private static int labelWidth(Object tile) {
+        Object text = invoke(tile, "getText");
+        if (text instanceof net.minecraft.network.chat.FormattedText formatted) {
+            return net.minecraft.client.Minecraft.getInstance().font.width(formatted);
+        }
+        return 0;
     }
 
     private static List<Slot> moveSlots(Object selection) {
@@ -134,7 +159,7 @@ public final class BattleScreen {
                 continue;
             }
             out.add(new Slot(BattleAction.move(i + 1),
-                    num(invoke(tile, "getX")), num(invoke(tile, "getY")), MOVE_W, MOVE_H, i / 2));
+                    num(invoke(tile, "getX")), num(invoke(tile, "getY")), MOVE_W, MOVE_H, i / 2, 0));
         }
         return out;
     }
@@ -145,7 +170,7 @@ public final class BattleScreen {
         for (int i = 0; i < tiles.size() && i < 6; i++) {
             Object tile = tiles.get(i);
             out.add(new Slot(BattleAction.party(i + 1),
-                    num(invoke(tile, "getX")), num(invoke(tile, "getY")), SWITCH_W, SWITCH_H, i / 2));
+                    num(invoke(tile, "getX")), num(invoke(tile, "getY")), SWITCH_W, SWITCH_H, i / 2, 0));
         }
         return out;
     }

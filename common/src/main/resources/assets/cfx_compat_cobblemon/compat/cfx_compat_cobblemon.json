@@ -25,8 +25,7 @@
         "key.cfx_compat_cobblemon.battle_prev": {},
         "key.cfx_compat_cobblemon.battle_next": {},
         "key.cfx_compat_cobblemon.battle_log_up": {},
-        "key.cfx_compat_cobblemon.battle_log_down": {},
-        "key.cfx_compat_cobblemon.battle_hud_toggle": {}
+        "key.cfx_compat_cobblemon.battle_log_down": {}
       }
     }
   ]
