@@ -265,7 +265,12 @@ public final class BattleHud {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
-        String label = Component.translatable("cfx_compat_cobblemon.hud.toggle").getString();
+        // The label names the action, not the subject: pressing this either hides or shows the
+        // hints, so the two states mean opposite things. A static noun read as a status line
+        // rather than a prompt ("Hints" told the player nothing about what the button does).
+        String label = Component.translatable(visible
+                ? "cfx_compat_cobblemon.hud.toggle.hide"
+                : "cfx_compat_cobblemon.hud.toggle.show").getString();
         int y = screen.height - NAV_MARGIN - HudLayout.GLYPH_SIZE;
         int cursor = drawGlyphRow(graphics, info.getGlyphs(), NAV_MARGIN, y);
         if (!label.isEmpty()) {
