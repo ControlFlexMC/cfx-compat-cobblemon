@@ -112,15 +112,7 @@ public final class BattleHud {
      * scan. Try both spellings rather than guessing.
      */
     private static IActionBindingInfo resolve(IActionBindingProvider provider, BattleAction action) {
-        IActionBindingInfo last = null;
-        for (String id : action.candidateIds()) {
-            IActionBindingInfo info = provider.getActiveBinding(id);
-            if (info != null && info.isBound()) {
-                return info;
-            }
-            last = info;
-        }
-        return last;
+        return provider.getActiveBinding(action.actionId());
     }
 
     /** One line per session so a report can tell "no bindings" from "no provider" from "no tiles". */

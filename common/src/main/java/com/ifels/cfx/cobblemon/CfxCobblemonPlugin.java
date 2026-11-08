@@ -1,5 +1,7 @@
 package com.ifels.cfx.cobblemon;
 
+import com.ifels.controlflex.api.ActionTrigger;
+import com.ifels.controlflex.api.IActionRegistrar;
 import com.ifels.controlflex.api.ICompatAssetInstaller;
 import com.ifels.controlflex.api.IControlFlexPlugin;
 import org.slf4j.Logger;
@@ -31,6 +33,20 @@ public final class CfxCobblemonPlugin implements IControlFlexPlugin {
             LOGGER.warn("[cfx-compat-cobblemon] failed to install {} — the {} battle actions "
                             + "will never fire while the battle screen is open",
                     COMPAT_FILE_NAME, BattleAction.values().length);
+        }
+    }
+
+    @Override
+    public void onRegisterActions(IActionRegistrar registrar) {
+        BattleActions.register(registrar);
+        LOGGER.info("[cfx-compat-cobblemon] declared {} battle actions", BattleAction.values().length);
+    }
+
+    @Override
+    public void onActionTriggered(ActionTrigger trigger) {
+        BattleAction action = BattleActions.byId(trigger.actionId());
+        if (action != null) {
+            BattleActionHandler.handle(action);
         }
     }
 

@@ -1,7 +1,6 @@
 package com.ifels.cfx.cobblemon.neoforge;
 
 import com.ifels.cfx.cobblemon.BattleHud;
-import com.ifels.cfx.cobblemon.BattleKeys;
 import com.ifels.cfx.cobblemon.BattleTicker;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -27,7 +26,6 @@ public final class CfxCobblemonNeoForge {
     }
 
     private void registerKeys(RegisterKeyMappingsEvent event) {
-        BattleKeys.registerAll(event::register);
     }
 
     @SubscribeEvent

@@ -5,28 +5,7 @@
   "config_version": "1.0.0",
   "mod_versions": [
     {
-      "version": "",
-      "screenKeys": {
-        "channels": ["keyMapping"],
-        "key.cfx_compat_cobblemon.battle_fight": {},
-        "key.cfx_compat_cobblemon.battle_switch": {},
-        "key.cfx_compat_cobblemon.battle_capture": {},
-        "key.cfx_compat_cobblemon.battle_run": {},
-        "key.cfx_compat_cobblemon.battle_move_1": {},
-        "key.cfx_compat_cobblemon.battle_move_2": {},
-        "key.cfx_compat_cobblemon.battle_move_3": {},
-        "key.cfx_compat_cobblemon.battle_move_4": {},
-        "key.cfx_compat_cobblemon.battle_party_1": {},
-        "key.cfx_compat_cobblemon.battle_party_2": {},
-        "key.cfx_compat_cobblemon.battle_party_3": {},
-        "key.cfx_compat_cobblemon.battle_party_4": {},
-        "key.cfx_compat_cobblemon.battle_party_5": {},
-        "key.cfx_compat_cobblemon.battle_party_6": {},
-        "key.cfx_compat_cobblemon.battle_prev": {},
-        "key.cfx_compat_cobblemon.battle_next": {},
-        "key.cfx_compat_cobblemon.battle_log_up": {},
-        "key.cfx_compat_cobblemon.battle_log_down": {}
-      }
+      "version": ""
     }
   ]
 }

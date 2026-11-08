@@ -61,17 +61,9 @@ public enum BattleAction {
         return "key." + MOD_ID + "." + key;
     }
 
-    /**
-     * Ids this action may be known by to ControlFlex, most specific first.
-     *
-     * <p>Which one wins depends on startup order: ControlFlex scans key mappings before the
-     * bridge's compat config is installed, so the action is first registered under the bridge
-     * mod id and later <em>re-attributed</em> to the compat config's {@code mod_id}
-     * ({@code cobblemon}). Both spellings exist in the log of a normal launch, so lookups try
-     * each in turn.</p>
-     */
-    public String[] candidateIds() {
-        return new String[]{"cobblemon:" + id(), MOD_ID + ":" + id(), id()};
+    /** Stable ControlFlex action id, written into the user's binding file. */
+    public String actionId() {
+        return MOD_ID + ":" + key;
     }
 
     public static BattleAction move(int slot) {
