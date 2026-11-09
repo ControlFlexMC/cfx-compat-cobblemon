@@ -60,8 +60,10 @@ public final class BattleActionHandler {
             int moved = state.move(action == BattleAction.PREV ? -1 : 1, slots.size());
             BattleScreen.Slot slot = slots.get(moved);
             warpCursor(slot);
+            // Confirm-page buttons carry no action of their own; name them by role instead.
+            String name = slot.action() == null ? "(confirm button)" : slot.action().id();
             LOGGER.info("[cfx-compat-cobblemon] highlight -> {} ({}/{})",
-                    slot.action().id(), moved + 1, slots.size());
+                    name, moved + 1, slots.size());
             return;
         }
 

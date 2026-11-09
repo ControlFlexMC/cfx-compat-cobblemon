@@ -82,6 +82,8 @@ public final class BattleScreen {
         ROOT,
         MOVE,
         SWITCH,
+        /** Forfeit confirmation: two response buttons, no per-button action of their own. */
+        CONFIRM,
         OTHER
     }
 
@@ -99,6 +101,9 @@ public final class BattleScreen {
         if (name.endsWith("BattleSwitchPokemonSelection")) {
             return PageKind.SWITCH;
         }
+        if (name.endsWith("ForfeitConfirmationSelection")) {
+            return PageKind.CONFIRM;
+        }
         return PageKind.OTHER;
     }
 
@@ -115,6 +120,9 @@ public final class BattleScreen {
         }
         if (name.endsWith("BattleSwitchPokemonSelection")) {
             return switchSlots(selection);
+        }
+        if (name.endsWith("ForfeitConfirmationSelection")) {
+            return confirmSlots(selection);
         }
         return List.of();
     }
@@ -171,6 +179,31 @@ public final class BattleScreen {
             Object tile = tiles.get(i);
             out.add(new Slot(BattleAction.party(i + 1),
                     num(invoke(tile, "getX")), num(invoke(tile, "getY")), SWITCH_W, SWITCH_H, i / 2, 0));
+        }
+        return out;
+    }
+
+    /**
+     * The two response buttons of the forfeit confirmation: decline first, accept second.
+     *
+     * <p>They are plain widgets ({@code getX/getY/getWidth/getHeight}), not Cobblemon tiles, and
+     * they carry no bridge action of their own — both fire through the built-in confirm (A) on
+     * whichever one the ring is on, so their slot action is {@code null} and the HUD advertises
+     * the {@code gui_press} binding on them instead.</p>
+     *
+     * <p>Decline leads on purpose. The page opens with the highlight on index 0, and index 0 on a
+     * destructive-confirm dialog must be the safe answer: an accidental press then costs one page
+     * switch, not a forfeited battle.</p>
+     */
+    private static List<Slot> confirmSlots(Object selection) {
+        List<Slot> out = new ArrayList<>(2);
+        for (String getter : new String[]{"getDeclineButton", "getAcceptButton"}) {
+            Object button = invoke(selection, getter);
+            if (button == null) {
+                continue;
+            }
+            out.add(new Slot(null, num(invoke(button, "getX")), num(invoke(button, "getY")),
+                    num(invoke(button, "getWidth")), num(invoke(button, "getHeight")), 0, 0));
         }
         return out;
     }

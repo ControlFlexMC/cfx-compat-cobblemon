@@ -26,6 +26,9 @@ import java.util.List;
  *       Badges go <em>inside</em> that corner, past the type icon (see {@link #MOVE_ICON_OVERHANG}).</li>
  *   <li><b>Party list</b> (2×3, 29px): level, name and HP bar all start at the left edge, so the
  *       badging falls back to the outside rule.</li>
+ *   <li><b>Forfeit confirmation</b> (2 buttons, 34×19, in a 113×45 panel): both buttons share one
+ *       badge (the confirm binding), centred under each button and dropped below the panel —
+ *       inside there is no room that would not cover the thumb artwork.</li>
  * </ul>
  *
  * <p>Pure geometry, no Minecraft types, so it is unit-testable.</p>
@@ -55,6 +58,14 @@ public final class HudLayout {
     public static final int ROOT_ICON_RESERVE = 20;
     /** Gap between the label and an inside badge. */
     public static final int ROOT_LABEL_GAP = 4;
+
+    /**
+     * How far a confirm badge sits below its button.
+     *
+     * <p>The confirmation panel leaves 8px under the buttons (45px panel, buttons at y+18 and
+     * 19px tall); ten puts the badge fully clear of the panel edge with a pixel of air.</p>
+     */
+    public static final int CONFIRM_BADGE_DROP = 10;
 
     private HudLayout() {
     }
@@ -115,6 +126,14 @@ public final class HudLayout {
             // Inside, bottom-left: above the tile's bottom edge, past the type icon.
             int x = (int) slot.x() + INSET;
             int y = (int) (slot.y() + slot.height()) - GLYPH_SIZE - GAP;
+            return new Anchor(x, y);
+        }
+        if (kind == BattleScreen.PageKind.CONFIRM) {
+            // Centred under each button, clear of the panel. The two buttons carry the same
+            // confirm badge, so symmetric centring reads as "press this on the ringed one" —
+            // inside a 34x19 button there is no room that would not cover the thumb artwork.
+            int x = (int) slot.x() + ((int) slot.width() - badgeWidth) / 2;
+            int y = (int) (slot.y() + slot.height()) + CONFIRM_BADGE_DROP;
             return new Anchor(x, y);
         }
         if (kind == BattleScreen.PageKind.ROOT && rootInsideAllowed) {

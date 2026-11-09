@@ -186,6 +186,49 @@ class HudLayoutTest {
         assertEquals(20 + HudLayout.INSET, a.x());
     }
 
+    // ===== forfeit confirmation =====
+
+    private static final BattleScreen.PageKind CONFIRM = BattleScreen.PageKind.CONFIRM;
+
+    /**
+     * Confirm buttons carry no action of their own — their badge comes from the built-in confirm
+     * press — which the layout code sees as a slot with a null action.
+     */
+    private static BattleScreen.Slot confirmButton(float x, float y) {
+        return new BattleScreen.Slot(null, x, y, 34f, 19f, 0, 0);
+    }
+
+    @Test
+    void confirmBadgeCentresUnderItsButton() {
+        HudLayout.Anchor a = single(confirmButton(500f, 300f), CONFIRM, HudLayout.GLYPH_SIZE);
+        assertEquals((int) (500f + (34f - HudLayout.GLYPH_SIZE) / 2f), a.x());
+        assertEquals(300 + 19 + HudLayout.CONFIRM_BADGE_DROP, a.y());
+    }
+
+    @Test
+    void confirmBadgesClearThePanelEdgeAndStaySymmetric() {
+        // Buttons sit 8px above the panel's bottom edge; the drop must clear the edge, and equal
+        // badge widths must centre both badges identically within their buttons.
+        List<BattleScreen.Slot> buttons = List.of(
+                confirmButton(500f, 300f), confirmButton(535f, 300f));
+        List<HudLayout.Anchor> anchors = HudLayout.anchorsFor(buttons, CONFIRM,
+                Collections.nCopies(2, HudLayout.GLYPH_SIZE));
+        for (HudLayout.Anchor a : anchors) {
+            assertTrue(a.y() >= 300 + 19 + 8, "badge must start below the panel edge");
+        }
+        assertEquals(anchors.get(0).x() - 500, anchors.get(1).x() - 535,
+                "same badge width: identical offset within each button");
+    }
+
+    @Test
+    void confirmHighlightIsExactlyTheButtonRect() {
+        HudLayout.Rect r = HudLayout.highlightFor(confirmButton(500f, 300f), CONFIRM);
+        assertEquals(500, r.x());
+        assertEquals(300, r.y());
+        assertEquals(34, r.width());
+        assertEquals(19, r.height());
+    }
+
     // ===== highlight ring =====
 
     @Test

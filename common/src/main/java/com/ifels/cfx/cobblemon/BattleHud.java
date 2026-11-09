@@ -39,6 +39,11 @@ public final class BattleHud {
     private static final int NAV_TEXT_OFF = 0xFF8A8A8A;
     /** ControlFlex's built-in cross-phase action; the battle bridge does not own it. */
     private static final String HUD_TOGGLE_ACTION = "hud_toggle";
+    /**
+     * ControlFlex's built-in confirm press. The forfeit confirmation's two buttons have no bridge
+     * action of their own — both fire on the ringed one through this — so their badges advertise it.
+     */
+    private static final String CONFIRM_ACTION = "gui_press";
 
     private static boolean diagnosed;
     private static boolean visible = true;
@@ -85,7 +90,7 @@ public final class BattleHud {
         List<List<IControllerGlyph>> badgeGlyphs = new ArrayList<>();
         List<Integer> badgeWidths = new ArrayList<>();
         for (BattleScreen.Slot slot : slots) {
-            IActionBindingInfo info = resolve(provider, slot.action());
+            IActionBindingInfo info = resolveForSlot(provider, slot);
             if (info == null || !info.isBound()) {
                 continue;
             }
@@ -111,6 +116,18 @@ public final class BattleHud {
      * {@code mod_id}, depending on whether the compat config loaded before or after the key
      * scan. Try both spellings rather than guessing.
      */
+    /**
+     * The binding a slot's badge shows. Slots without their own action (the forfeit confirmation's
+     * two buttons) are activated by the built-in confirm press on the ringed one, so they advertise
+     * that binding instead of having none.
+     */
+    private static IActionBindingInfo resolveForSlot(IActionBindingProvider provider,
+                                                     BattleScreen.Slot slot) {
+        return slot.action() == null
+                ? provider.getActiveBinding(CONFIRM_ACTION)
+                : resolve(provider, slot.action());
+    }
+
     private static IActionBindingInfo resolve(IActionBindingProvider provider, BattleAction action) {
         return provider.getActiveBinding(action.actionId());
     }
@@ -121,10 +138,12 @@ public final class BattleHud {
             return;
         }
         diagnosed = true;
-        IActionBindingInfo probe = resolve(provider, slots.get(0).action());
+        BattleScreen.Slot first = slots.get(0);
+        IActionBindingInfo probe = resolveForSlot(provider, first);
+        String id = first.action() == null ? "(forfeit confirm)" : first.action().id();
         LOGGER.info("[cfx-compat-cobblemon] battle sub-page open: {} tile(s); first={} bound={} layer={}",
                 slots.size(),
-                slots.get(0).action().id(),
+                id,
                 probe != null && probe.isBound(),
                 probe == null ? "-" : probe.getLayer());
     }
