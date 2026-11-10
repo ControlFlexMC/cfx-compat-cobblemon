@@ -60,10 +60,9 @@ public final class BattleActionHandler {
             int moved = state.move(action == BattleAction.PREV ? -1 : 1, slots.size());
             BattleScreen.Slot slot = slots.get(moved);
             warpCursor(slot);
-            // Confirm-page buttons carry no action of their own; name them by role instead.
-            String name = slot.action() == null ? "(confirm button)" : slot.action().id();
+            // Confirm-page buttons carry no action of their own; displayName() names them by role.
             LOGGER.info("[cfx-compat-cobblemon] highlight -> {} ({}/{})",
-                    name, moved + 1, slots.size());
+                    slot.displayName(), moved + 1, slots.size());
             return;
         }
 
@@ -75,7 +74,7 @@ public final class BattleActionHandler {
             state.select(i);
             boolean accepted = BattleScreen.click(selection, slot);
             LOGGER.info("[cfx-compat-cobblemon] {} at ({}, {}) -> {}",
-                    slot.action().id(), (int) slot.centerX(), (int) slot.centerY(),
+                    slot.displayName(), (int) slot.centerX(), (int) slot.centerY(),
                     accepted ? "accepted" : "rejected by screen");
             return;
         }

@@ -140,10 +140,9 @@ public final class BattleHud {
         diagnosed = true;
         BattleScreen.Slot first = slots.get(0);
         IActionBindingInfo probe = resolveForSlot(provider, first);
-        String id = first.action() == null ? "(forfeit confirm)" : first.action().id();
         LOGGER.info("[cfx-compat-cobblemon] battle sub-page open: {} tile(s); first={} bound={} layer={}",
                 slots.size(),
-                id,
+                first.displayName(),
                 probe != null && probe.isBound(),
                 probe == null ? "-" : probe.getLayer());
     }

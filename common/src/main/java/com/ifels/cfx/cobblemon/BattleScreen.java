@@ -56,6 +56,15 @@ public final class BattleScreen {
         public double centerY() {
             return y + height / 2.0;
         }
+
+        /**
+         * Name for logs and diagnostics. The single place that knows a slot may have no action
+         * (the forfeit confirmation's two buttons), so no caller has to repeat the null check —
+         * one that forgets it crashes the client tick with an NPE.
+         */
+        public String displayName() {
+            return action == null ? "(confirm button)" : action.id();
+        }
     }
 
     public static boolean isBattleScreen(Screen screen) {

@@ -68,7 +68,7 @@ public final class BattleTicker {
             BattleScreen.Slot current = slots.get(BattleSelection.INSTANCE.index());
             warpCursor(current);
             LOGGER.info("[cfx-compat-cobblemon] page opened: cursor parked on {} ({}/{})",
-                    current.action().id(), BattleSelection.INSTANCE.index() + 1, slots.size());
+                    current.displayName(), BattleSelection.INSTANCE.index() + 1, slots.size());
         }
     }
 
