@@ -193,20 +193,20 @@ public final class BattleScreen {
     }
 
     /**
-     * The two response buttons of the forfeit confirmation: decline first, accept second.
+     * The two response buttons of the forfeit confirmation, in reading order: accept, then decline.
      *
      * <p>They are plain widgets ({@code getX/getY/getWidth/getHeight}), not Cobblemon tiles, and
      * they carry no bridge action of their own — both fire through the built-in confirm (A) on
      * whichever one the ring is on, so their slot action is {@code null} and the HUD advertises
      * the {@code gui_press} binding on them instead.</p>
      *
-     * <p>Decline leads on purpose. The page opens with the highlight on index 0, and index 0 on a
-     * destructive-confirm dialog must be the safe answer: an accidental press then costs one page
-     * switch, not a forfeited battle.</p>
+     * <p>Order matters: the page opens with the highlight on index 0, and index 0 must be the
+     * button the player sees first (the left one), exactly like every other page starts on its
+     * first tile.</p>
      */
     private static List<Slot> confirmSlots(Object selection) {
         List<Slot> out = new ArrayList<>(2);
-        for (String getter : new String[]{"getDeclineButton", "getAcceptButton"}) {
+        for (String getter : new String[]{"getAcceptButton", "getDeclineButton"}) {
             Object button = invoke(selection, getter);
             if (button == null) {
                 continue;
