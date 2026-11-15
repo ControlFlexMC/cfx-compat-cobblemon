@@ -27,6 +27,12 @@ the four defaults) or cleared. The same card's 按键绑定 tab lists every acti
 Back is not an action either: the bridge registers a screen handler for `BattleGUI`, so the built-in
 back button steps one page out (move/party → action menu) and only minimises at the root.
 
+The radial interaction wheel (`InteractWheelGUI`) ships a compat entry instead of actions: its right
+stick runs in `RADIAL_PATH`, so a direction parks the cursor on that sector's button rather than
+dragging across the ring. `cursorRadius` 65 sits between the wheel's dead centre (41 GUI px) and its
+outer ring (85 GUI px, `SIZE = 170`) — move it up or down in the per-screen page if a skin or a GUI
+scale puts the sectors somewhere else.
+
 Showing or hiding the hints uses ControlFlex's own built-in `hud_toggle` action (0.13.0), not an
 action of ours — one binding works for every bridge. Its state is stored by ControlFlex per screen
 class, so the choice survives leaving the battle and restarting the game.
