@@ -14,7 +14,8 @@
             "threshold": 0.5,
             "cursorRadius": 65
           }
-        }
+        },
+        "com.cobblemon.mod.common.client.gui.interact.battleRequest.BattleConfigureGUI": {}
       }
     }
   ]

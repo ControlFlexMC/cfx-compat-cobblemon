@@ -1,6 +1,7 @@
 package com.ifels.cfx.cobblemon.fabric;
 
 import com.ifels.cfx.cobblemon.BattleHud;
+import com.ifels.cfx.cobblemon.BattleRequestHud;
 import com.ifels.cfx.cobblemon.BattleTicker;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -17,7 +18,9 @@ public final class CfxCobblemonFabric implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> BattleTicker.tick());
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) ->
                 ScreenEvents.afterRender(screen).register(
-                        (rendered, graphics, mouseX, mouseY, tickDelta) ->
-                                BattleHud.render(graphics, rendered)));
+                        (rendered, graphics, mouseX, mouseY, tickDelta) -> {
+                            BattleHud.render(graphics, rendered);
+                            BattleRequestHud.render(graphics, rendered);
+                        }));
     }
 }

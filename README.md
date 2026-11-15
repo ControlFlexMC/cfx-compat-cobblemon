@@ -12,7 +12,7 @@ registration and the per-screen handler registry).
 
 ## Actions
 
-All 18 actions are declared for `BattleGUI` only, so ControlFlex lists them under
+All 18 battle actions are declared for `BattleGUI` only, so ControlFlex lists them under
 Mods → Cobblemon → Screen 适配 → `BattleGUI` — that page is where they are bound, reset (back to
 the four defaults) or cleared. The same card's 按键绑定 tab lists every action of the mod.
 
@@ -27,15 +27,29 @@ the four defaults) or cleared. The same card's 按键绑定 tab lists every acti
 Back is not an action either: the bridge registers a screen handler for `BattleGUI`, so the built-in
 back button steps one page out (move/party → action menu) and only minimises at the root.
 
+Showing or hiding the hints uses ControlFlex's own built-in `hud_toggle` action (0.13.0), not an
+action of ours — one binding works for every bridge. Its state is stored by ControlFlex per screen
+class, so the choice survives leaving the battle and restarting the game.
+
 The radial interaction wheel (`InteractWheelGUI`) ships a compat entry instead of actions: its right
 stick runs in `RADIAL_PATH`, so a direction parks the cursor on that sector's button rather than
 dragging across the ring. `cursorRadius` 65 sits between the wheel's dead centre (41 GUI px) and its
 outer ring (85 GUI px, `SIZE = 170`) — move it up or down in the per-screen page if a skin or a GUI
 scale puts the sectors somewhere else.
 
-Showing or hiding the hints uses ControlFlex's own built-in `hud_toggle` action (0.13.0), not an
-action of ours — one binding works for every bridge. Its state is stored by ControlFlex per screen
-class, so the choice survives leaving the battle and restarting the game.
+## Battle request screen
+
+`BattleConfigureGUI` gets three actions of its own, scoped to that screen:
+
+| Action | Default | Does |
+| --- | --- | --- |
+| `battle_request_prev` / `battle_request_next` | LB / RB | step through the formats the server offered (single / double / triple / multi …) |
+| `battle_request_confirm` | Y | presses the primary button — challenge, accept, or invite, whatever it currently reads |
+
+Stepping calls the same `setCurrentPage` the on-screen arrows call (wrap-around included) and
+refreshes the button label, so the format the panel shows is always the format that gets sent. The
+press is refused while the button reports itself disabled. Hints follow the battle screen's layout:
+toggle bottom-left, format switch bottom-right, and the press glyph above the button it presses.
 
 ## How it works
 

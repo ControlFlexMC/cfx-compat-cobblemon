@@ -33,12 +33,12 @@ public final class BattleHud {
     private static final int HIGHLIGHT_EDGE = 0xFFFFD54F;
     private static final int HIGHLIGHT_TINT = 0x30FFD54F;
     /** Distance from the screen edge for the LB/RB hint. */
-    private static final int NAV_MARGIN = 6;
-    private static final int NAV_TEXT = 0xFFE0E0E0;
+    static final int NAV_MARGIN = 6;
+    static final int NAV_TEXT = 0xFFE0E0E0;
     /** Dimmer text for the toggle hint while the hints themselves are hidden. */
-    private static final int NAV_TEXT_OFF = 0xFF8A8A8A;
+    static final int NAV_TEXT_OFF = 0xFF8A8A8A;
     /** ControlFlex's built-in cross-phase action; the battle bridge does not own it. */
-    private static final String HUD_TOGGLE_ACTION = "hud_toggle";
+    static final String HUD_TOGGLE_ACTION = "hud_toggle";
     /**
      * ControlFlex's built-in confirm press. The forfeit confirmation's two buttons have no bridge
      * action of their own — both fire on the ringed one through this — so their badges advertise it.
@@ -299,7 +299,7 @@ public final class BattleHud {
     }
 
     /** Width of a glyph row including its "+" separators. */
-    private static int rowWidth(List<IControllerGlyph> glyphs) {
+    static int rowWidth(List<IControllerGlyph> glyphs) {
         if (glyphs.isEmpty()) {
             return 0;
         }
@@ -314,7 +314,7 @@ public final class BattleHud {
     }
 
     /** Draw a glyph row and return the x just past its last glyph. */
-    private static int drawGlyphRow(GuiGraphics graphics, List<IControllerGlyph> glyphs, int x, int y) {
+    static int drawGlyphRow(GuiGraphics graphics, List<IControllerGlyph> glyphs, int x, int y) {
         Minecraft mc = Minecraft.getInstance();
         int cursor = x;
         for (int i = 0; i < glyphs.size(); i++) {

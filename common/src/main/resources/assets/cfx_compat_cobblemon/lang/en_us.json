@@ -18,7 +18,11 @@
   "key.cfx_compat_cobblemon.battle_next": "Next Option",
   "key.cfx_compat_cobblemon.battle_log_up": "Log Scroll Up",
   "key.cfx_compat_cobblemon.battle_log_down": "Log Scroll Down",
+  "key.cfx_compat_cobblemon.battle_request_prev": "Previous Format",
+  "key.cfx_compat_cobblemon.battle_request_next": "Next Format",
+  "key.cfx_compat_cobblemon.battle_request_confirm": "Challenge / Accept",
   "cfx_compat_cobblemon.hud.prev_next": "Cycle options",
+  "cfx_compat_cobblemon.hud.request_cycle": "Switch format",
   "cfx_compat_cobblemon.hud.toggle.hide": "Hide hints",
   "cfx_compat_cobblemon.hud.toggle.show": "Show hints"
 }

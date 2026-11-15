@@ -42,7 +42,9 @@ public final class CfxCobblemonPlugin implements IControlFlexPlugin {
     @Override
     public void onRegisterActions(IActionRegistrar registrar) {
         BattleActions.register(registrar);
-        LOGGER.info("[cfx-compat-cobblemon] declared {} battle actions", BattleAction.values().length);
+        BattleRequestActions.register(registrar);
+        LOGGER.info("[cfx-compat-cobblemon] declared {} battle actions and {} request actions",
+                BattleAction.values().length, BattleRequestAction.values().length);
     }
 
     @Override
@@ -50,14 +52,21 @@ public final class CfxCobblemonPlugin implements IControlFlexPlugin {
         BattleAction action = BattleActions.byId(trigger.actionId());
         if (action != null) {
             BattleActionHandler.handle(action);
+            return;
+        }
+        BattleRequestAction request = BattleRequestActions.byId(trigger.actionId());
+        if (request != null) {
+            BattleRequestHandler.handle(request);
         }
     }
 
     @Override
     public void onControlFlexReady() {
-        LOGGER.info("[cfx-compat-cobblemon] ControlFlex ready; {} battle actions available",
-                BattleAction.values().length);
+        LOGGER.info("[cfx-compat-cobblemon] ControlFlex ready; {} battle actions and {} request "
+                        + "actions available",
+                BattleAction.values().length, BattleRequestAction.values().length);
         // The only point where ControlFlex has certainly published its API registries.
         BattleScreenHandler.register();
+        BattleRequestScreenHandler.register();
     }
 }
