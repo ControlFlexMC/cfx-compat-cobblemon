@@ -37,6 +37,10 @@ public final class BattleRequestActions {
         return switch (action) {
             case PREV -> DefaultBinding.of(ButtonName.LEFT_BUMPER, TriggerMode.PRESS);
             case NEXT -> DefaultBinding.of(ButtonName.RIGHT_BUMPER, TriggerMode.PRESS);
+            // The level row is the second axis: sticks get the format, the d-pad gets the rule,
+            // so both hands can work without moving off the row they are reading.
+            case LEVEL_PREV -> DefaultBinding.of(ButtonName.DPAD_LEFT, TriggerMode.PRESS);
+            case LEVEL_NEXT -> DefaultBinding.of(ButtonName.DPAD_RIGHT, TriggerMode.PRESS);
             case CONFIRM -> DefaultBinding.of(ButtonName.Y, TriggerMode.PRESS);
         };
     }

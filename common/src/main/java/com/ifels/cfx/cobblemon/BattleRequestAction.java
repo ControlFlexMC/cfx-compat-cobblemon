@@ -18,6 +18,12 @@ public enum BattleRequestAction {
     /** Step to the next format. */
     NEXT("battle_request_next"),
 
+    /** Step to the previous level rule ("no restriction" / "set level" …). */
+    LEVEL_PREV("battle_request_level_prev"),
+
+    /** Step to the next level rule. */
+    LEVEL_NEXT("battle_request_level_next"),
+
     /** Press the screen's primary button: challenge, accept, or invite. */
     CONFIRM("battle_request_confirm");
 

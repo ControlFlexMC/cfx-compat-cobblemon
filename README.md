@@ -39,17 +39,22 @@ scale puts the sectors somewhere else.
 
 ## Battle request screen
 
-`BattleConfigureGUI` gets three actions of its own, scoped to that screen:
+`BattleConfigureGUI` gets five actions of its own, scoped to that screen:
 
 | Action | Default | Does |
 | --- | --- | --- |
 | `battle_request_prev` / `battle_request_next` | LB / RB | step through the formats the server offered (single / double / triple / multi …) |
+| `battle_request_level_prev` / `battle_request_level_next` | D-pad ← / → | step through the level rule row ("no restriction", "set level" …) |
 | `battle_request_confirm` | Y | presses the primary button — challenge, accept, or invite, whatever it currently reads |
 
 Stepping calls the same `setCurrentPage` the on-screen arrows call (wrap-around included) and
 refreshes the button label, so the format the panel shows is always the format that gets sent. The
-press is refused while the button reports itself disabled. Hints follow the battle screen's layout:
-toggle bottom-left, format switch bottom-right, and the press glyph above the button it presses.
+level row mirrors that, without the label refresh — it only changes what the challenge carries. The
+press is refused while the button reports itself disabled.
+
+Hints are drawn on the controls themselves: one glyph outside each arrow on both rows, no caption,
+and the press glyph above the button it presses. The toggle hint stays bottom-left, like the battle
+screen's.
 
 ## How it works
 

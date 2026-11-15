@@ -54,12 +54,14 @@ class BattleRequestActionsTest {
     }
 
     @Test
-    void bumpersStepTheFormatAndYPressesTheButton() {
+    void bumpersStepTheFormatDpadStepsTheRuleAndYPressesTheButton() {
         Recorder recorder = new Recorder();
         BattleRequestActions.register(recorder);
 
         assertEquals("leftBumper", binding(recorder, BattleRequestAction.PREV).button());
         assertEquals("rightBumper", binding(recorder, BattleRequestAction.NEXT).button());
+        assertEquals("dpadLeft", binding(recorder, BattleRequestAction.LEVEL_PREV).button());
+        assertEquals("dpadRight", binding(recorder, BattleRequestAction.LEVEL_NEXT).button());
         assertEquals("buttonY", binding(recorder, BattleRequestAction.CONFIRM).button());
         for (BattleRequestAction action : BattleRequestAction.values()) {
             assertEquals(TriggerMode.PRESS, binding(recorder, action).mode(), action.name());

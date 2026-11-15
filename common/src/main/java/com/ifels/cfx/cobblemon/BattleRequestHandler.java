@@ -35,6 +35,18 @@ public final class BattleRequestHandler {
             return;
         }
 
+        if (action == BattleRequestAction.LEVEL_PREV || action == BattleRequestAction.LEVEL_NEXT) {
+            int step = action == BattleRequestAction.LEVEL_PREV ? -1 : 1;
+            String before = BattleRequestScreen.levelName(screen);
+            if (BattleRequestScreen.cycleLevel(screen, step)) {
+                LOGGER.info("[cfx-compat-cobblemon] level rule {} -> {} ({}/{})",
+                        before, BattleRequestScreen.levelName(screen),
+                        BattleRequestScreen.levelIndex(screen) + 1,
+                        BattleRequestScreen.levelCount());
+            }
+            return;
+        }
+
         int step = action == BattleRequestAction.PREV ? -1 : 1;
         String before = BattleRequestScreen.pageName(screen);
         boolean cycled = BattleRequestScreen.cycle(screen, step);

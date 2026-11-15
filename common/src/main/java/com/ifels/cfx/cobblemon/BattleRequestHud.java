@@ -37,6 +37,8 @@ public final class BattleRequestHud {
 
     /** Gap between the primary button and the glyph above it. */
     private static final int BADGE_GAP = 2;
+    /** Gap between an arrow and the glyph sitting outside it. */
+    private static final int ARROW_GAP = 1;
 
     private static boolean visible = true;
 
@@ -57,7 +59,7 @@ public final class BattleRequestHud {
             return;
         }
         drawConfirmBadge(graphics, provider);
-        drawCycleHint(graphics, screen, provider);
+        drawArrowGlyphs(graphics, screen, provider);
     }
 
     /** Same contract as {@link BattleHud#setVisible}: ControlFlex owns the toggle, we only draw. */
@@ -97,41 +99,44 @@ public final class BattleRequestHud {
         drawGlyphRow(graphics, glyphs, x, y);
     }
 
-    /** Bottom-right: the two buttons that step through the formats the server offered. */
-    private static void drawCycleHint(GuiGraphics graphics, Screen screen,
-                                      IActionBindingProvider provider) {
-        List<IControllerGlyph> prev = glyphsOf(provider, BattleRequestAction.PREV.actionId());
-        List<IControllerGlyph> next = glyphsOf(provider, BattleRequestAction.NEXT.actionId());
-        if (prev.isEmpty() && next.isEmpty()) {
+    /**
+     * Both arrow rows carry their own hint: one glyph outside each arrow, no label.
+     *
+     * <p>The arrow already says which way the press goes and the panel leaves no room for a
+     * caption on both sides — a word would either overlap the format icons or push the glyph off
+     * the panel.</p>
+     */
+    private static void drawArrowGlyphs(GuiGraphics graphics, Screen screen,
+                                        IActionBindingProvider provider) {
+        drawArrowPair(graphics, provider, BattleRequestScreen.formatArrows(screen),
+                BattleRequestAction.PREV, BattleRequestAction.NEXT);
+        drawArrowPair(graphics, provider, BattleRequestScreen.levelArrows(screen),
+                BattleRequestAction.LEVEL_PREV, BattleRequestAction.LEVEL_NEXT);
+    }
+
+    private static void drawArrowPair(GuiGraphics graphics, IActionBindingProvider provider,
+                                      List<Button> arrows,
+                                      BattleRequestAction previous, BattleRequestAction next) {
+        if (arrows.size() < 2) {
             return;
         }
+        drawOutside(graphics, glyphsOf(provider, previous.actionId()), arrows.get(0), true);
+        drawOutside(graphics, glyphsOf(provider, next.actionId()),
+                arrows.get(arrows.size() - 1), false);
+    }
 
-        Minecraft mc = Minecraft.getInstance();
-        String label = Component.translatable("cfx_compat_cobblemon.hud.request_cycle").getString();
-        String slash = "/";
-
-        int width = rowWidth(prev) + rowWidth(next)
-                + (prev.isEmpty() || next.isEmpty() ? 0 : mc.font.width(slash) + 2)
-                + (label.isEmpty() ? 0 : mc.font.width(" ") + mc.font.width(label));
-
-        int y = screen.height - NAV_MARGIN - HudLayout.GLYPH_SIZE;
-        int x = screen.width - NAV_MARGIN - width;
-
-        int cursor = x;
-        if (!prev.isEmpty()) {
-            cursor = drawGlyphRow(graphics, prev, cursor, y);
+    /** One glyph just outside an arrow, vertically centred on it. */
+    private static void drawOutside(GuiGraphics graphics, List<IControllerGlyph> glyphs,
+                                    Button arrow, boolean toTheLeft) {
+        if (glyphs.isEmpty()) {
+            return;
         }
-        if (!prev.isEmpty() && !next.isEmpty()) {
-            graphics.drawString(mc.font, slash, cursor + 1, y + 1, NAV_TEXT, false);
-            cursor += mc.font.width(slash) + 2;
-        }
-        if (!next.isEmpty()) {
-            cursor = drawGlyphRow(graphics, next, cursor, y);
-        }
-        if (!label.isEmpty()) {
-            cursor += mc.font.width(" ");
-            graphics.drawString(mc.font, label, cursor, y + 1, NAV_TEXT, false);
-        }
+        int width = rowWidth(glyphs);
+        int x = toTheLeft
+                ? arrow.getX() - width - ARROW_GAP
+                : arrow.getX() + arrow.getWidth() + ARROW_GAP;
+        int y = arrow.getY() + (arrow.getHeight() - HudLayout.GLYPH_SIZE) / 2;
+        drawGlyphRow(graphics, glyphs, x, y);
     }
 
     /** Bottom-left, dimmed while the hints are off so the way back stays visible. */

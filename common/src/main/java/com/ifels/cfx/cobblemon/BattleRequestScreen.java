@@ -1,11 +1,14 @@
 package com.ifels.cfx.cobblemon;
 
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +32,10 @@ public final class BattleRequestScreen {
 
     public static final String GUI_CLASS =
             "com.cobblemon.mod.common.client.gui.interact.battleRequest.BattleConfigureGUI";
+
+    /** The small arrow buttons on both rows; matched by name so no class is loaded eagerly. */
+    private static final String ARROW_CLASS =
+            "com.cobblemon.mod.common.client.gui.interact.battleRequest.BattleRequestNavigationButton";
 
     /** Field and method handles, keyed by {@code declaringClass#member}. */
     private static final Map<String, Object> MEMBERS = new ConcurrentHashMap<>();
@@ -88,6 +95,96 @@ public final class BattleRequestScreen {
         // to be refreshed by hand — the arrows do the same in their own callbacks.
         invokeNoArg(screen, "updateRequestButtonText");
         return true;
+    }
+
+    /** Index of the level rule shown on the second row. */
+    public static int levelIndex(Screen screen) {
+        Object value = fieldValue(screen, "levelRulesetOptionIndex");
+        return value instanceof Number number ? number.intValue() : 0;
+    }
+
+    /** How many level rules the screen offers; 0 when this request has no level row. */
+    public static int levelCount() {
+        Object value = staticValue("levelRulesetOption");
+        return value instanceof List<?> list ? list.size() : 0;
+    }
+
+    /** Log-friendly name of the shown level rule. */
+    public static String levelName(Screen screen) {
+        Object value = staticValue("levelRulesetOption");
+        int index = levelIndex(screen);
+        if (!(value instanceof List<?> list) || index < 0 || index >= list.size()) {
+            return String.valueOf(index);
+        }
+        return String.valueOf(list.get(index));
+    }
+
+    /**
+     * Step one level rule forward or back, like the arrows under the format title.
+     *
+     * <p>No button-label refresh: the level rule only changes what the challenge packet carries,
+     * and the screen's own arrows do not touch the label either.</p>
+     */
+    public static boolean cycleLevel(Screen screen, int step) {
+        if (!isConfigureScreen(screen) || levelCount() == 0) {
+            return false;
+        }
+        return invokeInt(screen, "setLevelRulesetOptionIndex", levelIndex(screen) + step);
+    }
+
+    /**
+     * The format arrows, left to right; empty when the screen has none.
+     *
+     * <p>Read from the live widget list rather than the layout constants: the arrows move with
+     * the panel, and a future Cobblemon that re-lays them out keeps working.</p>
+     */
+    public static List<Button> formatArrows(Screen screen) {
+        List<Button> remaining = new ArrayList<>(arrows(screen));
+        remaining.removeAll(levelArrows(screen));
+        if (remaining.isEmpty()) {
+            return List.of();
+        }
+        int topY = remaining.get(0).getY();
+        List<Button> out = new ArrayList<>();
+        for (Button arrow : remaining) {
+            if (arrow.getY() == topY) {
+                out.add(arrow);
+            }
+        }
+        out.sort(Comparator.comparingInt(Button::getX));
+        return out;
+    }
+
+    /**
+     * The level-rule arrows, left to right; empty when the screen has no level row (a team
+     * request does not offer one).
+     */
+    public static List<Button> levelArrows(Screen screen) {
+        List<Button> all = arrows(screen);
+        List<Button> out = new ArrayList<>();
+        for (String field : new String[]{"autoLevelNavButtonLeft", "autoLevelNavButtonRight"}) {
+            Object value = staticValue(field);
+            if (value instanceof Button arrow && all.contains(arrow)) {
+                out.add(arrow);
+            }
+        }
+        out.sort(Comparator.comparingInt(Button::getX));
+        return out;
+    }
+
+    /** Every {@code BattleRequestNavigationButton} currently on the screen, top-left first. */
+    private static List<Button> arrows(Screen screen) {
+        if (!isConfigureScreen(screen)) {
+            return List.of();
+        }
+        List<Button> out = new ArrayList<>();
+        for (GuiEventListener child : screen.children()) {
+            if (child instanceof Button button && ARROW_CLASS.equals(child.getClass().getName())) {
+                out.add(button);
+            }
+        }
+        out.sort(Comparator.comparingInt(Button::getY).thenComparingInt(Button::getX));
+        return out;
     }
 
     /** The screen's primary button, or null while the screen is still building itself. */
