@@ -10,9 +10,11 @@ import org.slf4j.LoggerFactory;
 /**
  * ControlFlex SPI entry point.
  *
- * <p>Installs the bundled compat config, which moves the pseudo key mappings into
- * ControlFlex's GUI layer. Without it they stay on the MAIN layer and never fire while a
- * screen is open.</p>
+ * <p>Installs the bundled compat config, whose only job now is to register
+ * {@code BattleGUI} as a known screen of the Cobblemon card: the compat file owns the entry in
+ * 模组适配 → Cobblemon → Screen 适配, and ControlFlex fills that page from the actions declared
+ * in {@link #onRegisterActions}. Without the file the screen has no owner, so the page cannot be
+ * opened and the battle actions have nowhere to be edited.</p>
  */
 public final class CfxCobblemonPlugin implements IControlFlexPlugin {
 
@@ -30,8 +32,9 @@ public final class CfxCobblemonPlugin implements IControlFlexPlugin {
     @Override
     public void onInstallCompatConfigs(ICompatAssetInstaller installer) {
         if (!installer.install(COMPAT_RESOURCE, COMPAT_FILE_NAME)) {
-            LOGGER.warn("[cfx-compat-cobblemon] failed to install {} — the {} battle actions "
-                            + "will never fire while the battle screen is open",
+            LOGGER.warn("[cfx-compat-cobblemon] failed to install {} — BattleGUI will not be listed "
+                            + "under Cobblemon → Screen 适配, so the {} battle actions cannot be "
+                            + "seen or rebound in-game",
                     COMPAT_FILE_NAME, BattleAction.values().length);
         }
     }

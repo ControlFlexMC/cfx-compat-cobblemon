@@ -7,12 +7,14 @@ Cobblemon's battle UI is pointer-only: the option tiles are not focusable widget
 This bridge turns "what can I do right now" into ordinary ControlFlex actions, replays the press as
 a click on the right tile, and draws the actually-bound button on each tile.
 
-MC 1.21.1, Fabric and NeoForge, requires ControlFlex API 0.12.0 or newer.
+MC 1.21.1, Fabric and NeoForge, requires ControlFlex API 0.9.2.2 or newer (native action
+registration and the per-screen handler registry).
 
 ## Actions
 
-All 18 actions live in `category.cfx_compat_cobblemon.battle` and are unbound by default; bind them
-under ControlFlex → Mods → Cobblemon → Battle.
+All 18 actions are declared for `BattleGUI` only, so ControlFlex lists them under
+Mods → Cobblemon → Screen 适配 → `BattleGUI` — that page is where they are bound, reset (back to
+the four defaults) or cleared. The same card's 按键绑定 tab lists every action of the mod.
 
 | Group | Actions | Fires on |
 | --- | --- | --- |

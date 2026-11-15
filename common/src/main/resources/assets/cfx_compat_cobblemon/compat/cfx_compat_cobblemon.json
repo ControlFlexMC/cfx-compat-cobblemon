@@ -5,7 +5,10 @@
   "config_version": "1.0.0",
   "mod_versions": [
     {
-      "version": ""
+      "version": "",
+      "screen": {
+        "com.cobblemon.mod.common.client.gui.battle.BattleGUI": {}
+      }
     }
   ]
 }
