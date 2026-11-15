@@ -100,7 +100,7 @@ public final class BattleRequestHud {
     }
 
     /**
-     * Both arrow rows carry their own hint: one glyph outside each arrow, no label.
+     * Both arrow rows carry their own hint: one glyph outside the panel on each side, no label.
      *
      * <p>The arrow already says which way the press goes and the panel leaves no room for a
      * caption on both sides — a word would either overlap the format icons or push the glyph off
@@ -108,34 +108,46 @@ public final class BattleRequestHud {
      */
     private static void drawArrowGlyphs(GuiGraphics graphics, Screen screen,
                                         IActionBindingProvider provider) {
+        int panelLeft = BattleRequestScreen.panelLeft(screen);
+        int panelWidth = BattleRequestScreen.panelWidth();
+        if (panelWidth <= 0) {
+            return;
+        }
         drawArrowPair(graphics, provider, BattleRequestScreen.formatArrows(screen),
-                BattleRequestAction.PREV, BattleRequestAction.NEXT);
+                BattleRequestAction.PREV, BattleRequestAction.NEXT, panelLeft, panelWidth);
         drawArrowPair(graphics, provider, BattleRequestScreen.levelArrows(screen),
-                BattleRequestAction.LEVEL_PREV, BattleRequestAction.LEVEL_NEXT);
+                BattleRequestAction.LEVEL_PREV, BattleRequestAction.LEVEL_NEXT, panelLeft, panelWidth);
     }
 
     private static void drawArrowPair(GuiGraphics graphics, IActionBindingProvider provider,
-                                      List<Button> arrows,
-                                      BattleRequestAction previous, BattleRequestAction next) {
+                                      List<Button> arrows, BattleRequestAction previous,
+                                      BattleRequestAction next, int panelLeft, int panelWidth) {
         if (arrows.size() < 2) {
             return;
         }
-        drawOutside(graphics, glyphsOf(provider, previous.actionId()), arrows.get(0), true);
-        drawOutside(graphics, glyphsOf(provider, next.actionId()),
-                arrows.get(arrows.size() - 1), false);
+        Button first = arrows.get(0);
+        int y = first.getY() + (first.getHeight() - HudLayout.GLYPH_SIZE) / 2;
+        drawOutside(graphics, glyphsOf(provider, previous.actionId()), panelLeft, panelWidth, true, y);
+        drawOutside(graphics, glyphsOf(provider, next.actionId()), panelLeft, panelWidth, false, y);
     }
 
-    /** One glyph just outside an arrow, vertically centred on it. */
+    /**
+     * One glyph just outside the panel, vertically centred on its row's arrows.
+     *
+     * <p>Both sides measure from the panel edge rather than from the arrow: the arrows are not
+     * symmetric inside the 113 px artwork, so anchoring to them put the left glyph outside the
+     * panel and the right one inside it. Measuring from the panel also makes the two rows line up
+     * with each other.</p>
+     */
     private static void drawOutside(GuiGraphics graphics, List<IControllerGlyph> glyphs,
-                                    Button arrow, boolean toTheLeft) {
+                                    int panelLeft, int panelWidth, boolean toTheLeft, int y) {
         if (glyphs.isEmpty()) {
             return;
         }
         int width = rowWidth(glyphs);
         int x = toTheLeft
-                ? arrow.getX() - width - ARROW_GAP
-                : arrow.getX() + arrow.getWidth() + ARROW_GAP;
-        int y = arrow.getY() + (arrow.getHeight() - HudLayout.GLYPH_SIZE) / 2;
+                ? panelLeft - width - ARROW_GAP
+                : panelLeft + panelWidth + ARROW_GAP;
         drawGlyphRow(graphics, glyphs, x, y);
     }
 

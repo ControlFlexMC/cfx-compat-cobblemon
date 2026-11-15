@@ -52,9 +52,10 @@ refreshes the button label, so the format the panel shows is always the format t
 level row mirrors that, without the label refresh — it only changes what the challenge carries. The
 press is refused while the button reports itself disabled.
 
-Hints are drawn on the controls themselves: one glyph outside each arrow on both rows, no caption,
-and the press glyph above the button it presses. The toggle hint stays bottom-left, like the battle
-screen's.
+Hints are drawn on the controls themselves: one glyph outside the panel on each side per row, no
+caption, and the press glyph above the button it presses. Both sides measure from the panel edge
+(113 GUI px, the artwork's own width), so the format row and the level row line up. The toggle hint
+stays bottom-left, like the battle screen's.
 
 ## How it works
 

@@ -120,6 +120,27 @@ public final class BattleRequestScreen {
     }
 
     /**
+     * Width of the panel's own artwork, in GUI pixels.
+     *
+     * <p>Cobblemon's {@code SIZE} is the same number the background texture is drawn at and the
+     * same one its layout maths centres on, so it doubles as the panel edge for anything that has
+     * to sit outside it.</p>
+     */
+    public static int panelWidth() {
+        Object value = staticValue("SIZE");
+        return value instanceof Number number ? number.intValue() : 0;
+    }
+
+    /** Left edge of the panel; it is centred on the screen. */
+    public static int panelLeft(Screen screen) {
+        int width = panelWidth();
+        if (screen == null || width == 0) {
+            return 0;
+        }
+        return (screen.width - width) / 2;
+    }
+
+    /**
      * Step one level rule forward or back, like the arrows under the format title.
      *
      * <p>No button-label refresh: the level rule only changes what the challenge packet carries,
