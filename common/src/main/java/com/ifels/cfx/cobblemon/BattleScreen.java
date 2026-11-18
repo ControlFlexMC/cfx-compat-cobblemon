@@ -257,6 +257,31 @@ public final class BattleScreen {
     }
 
     /**
+     * Whether the current sub-page is drawing Cobblemon's own back arrow in the bottom-left corner.
+     *
+     * <p>The arrow is a field on each selection, not a widget, and each page decides at render time
+     * whether to draw it: the action menu only while the last choice can still be taken back, the
+     * party page only when the switch was not forced, and the move page always. The forfeit
+     * confirmation and the pages this bridge does not lay out have none.</p>
+     *
+     * <p>The hint overlays call this to keep their own bottom-left hint from overprinting it.</p>
+     */
+    public static boolean backArrowShown(Object selection) {
+        if (selection == null) {
+            return false;
+        }
+        return switch (kindOf(selection)) {
+            case ROOT -> invoke(selection, "getLastAnwseredRequest") != null;
+            case MOVE -> true;
+            case SWITCH -> {
+                Object request = invoke(selection, "getRequest");
+                yield !Boolean.TRUE.equals(invoke(request, "getForceSwitch"));
+            }
+            default -> false;
+        };
+    }
+
+    /**
      * Leave the current sub-page and land back on the action menu.
      *
      * <p>{@code changeActionSelection} belongs to {@code BattleGUI}, not to the sub-page — calling

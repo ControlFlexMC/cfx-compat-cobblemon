@@ -73,7 +73,7 @@ public final class BattleHud {
         diagnoseOnce(provider, slots);
         // Deliberately before the gate: this is the way back when the hints are off, so it stays
         // on screen (dimmed) instead of vanishing with everything else.
-        drawHudToggleHint(graphics, screen, provider);
+        drawHudToggleHint(graphics, screen, provider, BattleScreen.backArrowShown(selection));
         if (!visible) {
             return;
         }
@@ -266,10 +266,15 @@ public final class BattleHud {
      * Bottom-left, on the same baseline as the LB/RB hint: which key turns this overlay on and off.
      *
      * <p>Drawn even while the hints are hidden (dimmed) — otherwise the one control the player
-     * needs to bring them back would disappear together with them.</p>
+     * needs to bring them back would disappear together with them. Skipped while Cobblemon draws
+     * its own back arrow in the same corner: the two would overprint each other, and the arrow is
+     * the button the player is more likely to want there.</p>
      */
     private static void drawHudToggleHint(GuiGraphics graphics, Screen screen,
-                                          IActionBindingProvider provider) {
+                                          IActionBindingProvider provider, boolean backArrowShown) {
+        if (backArrowShown) {
+            return;
+        }
         IActionBindingInfo info = provider.getActiveBinding(HUD_TOGGLE_ACTION);
         if (info == null || !info.isBound() || info.getGlyphs().isEmpty()) {
             return;
@@ -300,6 +305,11 @@ public final class BattleHud {
 
     /** Width of a glyph row including its "+" separators. */
     static int rowWidth(List<IControllerGlyph> glyphs) {
+        return rowWidth(glyphs, HudLayout.GLYPH_SIZE);
+    }
+
+    /** Width of a glyph row drawn at {@code glyphSize}, including its "+" separators. */
+    static int rowWidth(List<IControllerGlyph> glyphs, int glyphSize) {
         if (glyphs.isEmpty()) {
             return 0;
         }
@@ -308,13 +318,19 @@ public final class BattleHud {
             if (i > 0) {
                 width += Minecraft.getInstance().font.width("+") + 2;
             }
-            width += HudLayout.GLYPH_SIZE;
+            width += glyphSize;
         }
         return width;
     }
 
     /** Draw a glyph row and return the x just past its last glyph. */
     static int drawGlyphRow(GuiGraphics graphics, List<IControllerGlyph> glyphs, int x, int y) {
+        return drawGlyphRow(graphics, glyphs, x, y, HudLayout.GLYPH_SIZE);
+    }
+
+    /** Draw a glyph row at {@code glyphSize} and return the x just past its last glyph. */
+    static int drawGlyphRow(GuiGraphics graphics, List<IControllerGlyph> glyphs, int x, int y,
+                            int glyphSize) {
         Minecraft mc = Minecraft.getInstance();
         int cursor = x;
         for (int i = 0; i < glyphs.size(); i++) {
@@ -325,20 +341,22 @@ public final class BattleHud {
             IControllerGlyph glyph = glyphs.get(i);
             String fallback = glyph.getTextFallback();
             if (fallback != null) {
-                float scale = 0.6f;
+                // Keep the label's size proportional to its slot: at the default 10px slot this
+                // is the old 0.6 scale, and a larger slot does not leave the text looking lost.
+                float scale = 0.6f * glyphSize / HudLayout.GLYPH_SIZE;
                 graphics.pose().pushPose();
-                graphics.pose().translate(cursor, y + HudLayout.GLYPH_SIZE / 2f, 0);
+                graphics.pose().translate(cursor, y + glyphSize / 2f, 0);
                 graphics.pose().scale(scale, scale, 1f);
                 graphics.drawString(mc.font, fallback, 0,
                         Math.round(-mc.font.lineHeight / 2f), 0xFFFFFFFF, false);
                 graphics.pose().popPose();
             } else {
                 ResourceLocation texture = ResourceLocation.parse(glyph.getTextureId());
-                graphics.blit(texture, cursor, y, HudLayout.GLYPH_SIZE, HudLayout.GLYPH_SIZE,
+                graphics.blit(texture, cursor, y, glyphSize, glyphSize,
                         glyph.getU(), glyph.getV(), glyph.getWidth(), glyph.getHeight(),
                         glyph.getTextureWidth(), glyph.getTextureHeight());
             }
-            cursor += HudLayout.GLYPH_SIZE;
+            cursor += glyphSize;
         }
         return cursor;
     }

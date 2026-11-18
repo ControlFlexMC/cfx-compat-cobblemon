@@ -3,6 +3,7 @@ package com.ifels.cfx.cobblemon;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -147,10 +148,27 @@ public final class BattleRequestScreen {
      * and the screen's own arrows do not touch the label either.</p>
      */
     public static boolean cycleLevel(Screen screen, int step) {
-        if (!isConfigureScreen(screen) || levelCount() == 0) {
+        if (!isConfigureScreen(screen) || levelCount() == 0 || !levelRowShown(screen)) {
             return false;
         }
         return invokeInt(screen, "setLevelRulesetOptionIndex", levelIndex(screen) + step);
+    }
+
+    /**
+     * Whether the level-rule row is on screen for the current page.
+     *
+     * <p>Cobblemon builds the level arrows once, when the screen opens on a format that has
+     * levels, and does not remove them when the player cycles to the team page — its render only
+     * clears their {@code active} flag. So an arrow being present says the screen <em>can</em>
+     * show the row; both arrows being enabled says this page <em>does</em>.</p>
+     */
+    public static boolean levelRowShown(Screen screen) {
+        return levelRowShown(levelArrows(screen));
+    }
+
+    /** The same test for a list already read off the screen. */
+    public static boolean levelRowShown(List<Button> levelArrows) {
+        return levelArrows.size() >= 2 && levelArrows.get(0).active && levelArrows.get(1).active;
     }
 
     /**
@@ -212,6 +230,23 @@ public final class BattleRequestScreen {
     public static Button primaryButton() {
         Object value = staticValue("requestButton");
         return value instanceof Button button ? button : null;
+    }
+
+    /**
+     * The label the primary button is drawing right now; empty when there is no button.
+     *
+     * <p>{@code BattleRequestButton} keeps the visible text in its own mutable {@code text} field
+     * and rewrites it when the format changes, while the inherited message keeps the value the
+     * button was built with. Read the field first so a glyph placed after the label follows
+     * "Challenge"/"Invite"/… instead of the stale message.</p>
+     */
+    public static Component primaryLabel() {
+        Button button = primaryButton();
+        if (button == null) {
+            return Component.empty();
+        }
+        Object value = fieldValue(button, "text");
+        return value instanceof Component label ? label : button.getMessage();
     }
 
     /**

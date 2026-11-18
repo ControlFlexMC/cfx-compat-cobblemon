@@ -254,4 +254,25 @@ class HudLayoutTest {
     void pageWithNoBadgesProducesNoAnchors() {
         assertTrue(HudLayout.anchorsFor(new ArrayList<>(), ROOT, new ArrayList<>()).isEmpty());
     }
+
+    // ===== request screen: confirm glyph beside the button label =====
+
+    @Test
+    void requestConfirmGlyphStartsPastTheLabelsRightEdge() {
+        // zh_cn "挑战" is two double-width glyphs, ~24px; the label is centred at x + 35.
+        assertEquals(135 + 12 + HudLayout.GAP, HudLayout.requestLabelBadgeX(135, 24));
+    }
+
+    @Test
+    void requestConfirmGlyphRoundsAnOddLabelWidthOutward() {
+        // The button truncates the label's left edge when it centres the text, so the glyph has
+        // to clear the untruncated right edge: 25 / 2 truncates to 12 on the left, 13 on the right.
+        assertEquals(100 + 13 + HudLayout.GAP, HudLayout.requestLabelBadgeX(100, 25));
+    }
+
+    @Test
+    void requestConfirmGlyphIsCentredOnTheButtonLine() {
+        // The 19px request button leaves (19 - 10) / 2 = 4px above and below a 10px glyph.
+        assertEquals(204, HudLayout.requestLabelBadgeY(200, 19, HudLayout.GLYPH_SIZE));
+    }
 }

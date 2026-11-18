@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +23,9 @@ import static com.ifels.cfx.cobblemon.BattleHud.drawGlyphRow;
 import static com.ifels.cfx.cobblemon.BattleHud.rowWidth;
 
 /**
- * Key hints for the battle request screen, laid out like the battle screen's:
- * the toggle in the bottom-left, the format switch in the bottom-right, and the press that
- * commits the request drawn on the button it presses.
+ * Key hints for the battle request screen: the toggle in the bottom-left, one glyph beside each
+ * arrow outside the panel, and the press that commits the request drawn on the button it presses,
+ * just past the label.
  *
  * <p>Bindings come from ControlFlex's {@code IActionBindingProvider}, so a rebind or a controller
  * swap shows up on the next frame — the same contract {@link BattleHud} works under.</p>
@@ -35,8 +36,17 @@ public final class BattleRequestHud {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BattleAction.MOD_ID);
 
-    /** Gap between the primary button and the glyph above it. */
-    private static final int BADGE_GAP = 2;
+    /**
+     * Size of the format/level glyphs outside the panel.
+     *
+     * <p>ControlFlex draws its own hints at 16px, and the 32px atlas cell stays crisp at half
+     * size; the panel has room for that on both sides, so the outer columns read at a glance.</p>
+     */
+    private static final int SIDE_GLYPH_SIZE = 16;
+    /** x {@code BattleRequestButton} centres its label on (69px wide, text drawn at {@code x + 35}). */
+    private static final int PRIMARY_LABEL_CENTER = 35;
+    /** The font that button renders its label with ({@code CobblemonResources.DEFAULT_LARGE}). */
+    private static final ResourceLocation PRIMARY_LABEL_FONT = ResourceLocation.parse("uniform");
     /** Gap between an arrow and the glyph sitting outside it. */
     private static final int ARROW_GAP = 1;
 
@@ -76,10 +86,11 @@ public final class BattleRequestHud {
     }
 
     /**
-     * The press that commits the request, parked just above the button it presses.
+     * The press that commits the request, on the button's own line just past its label.
      *
-     * <p>No label: the button's own text already says "Challenge"/"Accept"/"Invite", and
-     * repeating it above the glyph read as two captions for one control.</p>
+     * <p>It used to hang above the button, where it collided with the opponent's name — the gap
+     * between the name baseline and the button's top edge is thinner than a glyph. Beside the
+     * label it also reads as "this button, this press" rather than as a caption above it.</p>
      */
     private static void drawConfirmBadge(GuiGraphics graphics, IActionBindingProvider provider) {
         Button button = BattleRequestScreen.primaryButton();
@@ -90,13 +101,18 @@ public final class BattleRequestHud {
         if (glyphs.isEmpty()) {
             return;
         }
-        int width = rowWidth(glyphs);
-        int x = button.getX() + (button.getWidth() - width) / 2;
-        int y = button.getY() - HudLayout.GLYPH_SIZE - BADGE_GAP;
-        if (y < 0) {
-            return;
-        }
+        int x = HudLayout.requestLabelBadgeX(button.getX() + PRIMARY_LABEL_CENTER,
+                primaryLabelWidth());
+        int y = HudLayout.requestLabelBadgeY(button.getY(), button.getHeight(), HudLayout.GLYPH_SIZE);
         drawGlyphRow(graphics, glyphs, x, y);
+    }
+
+    /** Advance of the label the button is drawing now, measured with the same style it uses. */
+    private static int primaryLabelWidth() {
+        Component label = BattleRequestScreen.primaryLabel();
+        Component styled = label.copy()
+                .withStyle(style -> style.withBold(true).withFont(PRIMARY_LABEL_FONT));
+        return Minecraft.getInstance().font.width(styled);
     }
 
     /**
@@ -115,8 +131,14 @@ public final class BattleRequestHud {
         }
         drawArrowPair(graphics, provider, BattleRequestScreen.formatArrows(screen),
                 BattleRequestAction.PREV, BattleRequestAction.NEXT, panelLeft, panelWidth);
-        drawArrowPair(graphics, provider, BattleRequestScreen.levelArrows(screen),
-                BattleRequestAction.LEVEL_PREV, BattleRequestAction.LEVEL_NEXT, panelLeft, panelWidth);
+        List<Button> levelArrows = BattleRequestScreen.levelArrows(screen);
+        // Cobblemon keeps the level arrows in the screen after a cycle to the team page and only
+        // disables them; without this check the d-pad hints would point at a row that is not there.
+        if (BattleRequestScreen.levelRowShown(levelArrows)) {
+            drawArrowPair(graphics, provider, levelArrows,
+                    BattleRequestAction.LEVEL_PREV, BattleRequestAction.LEVEL_NEXT,
+                    panelLeft, panelWidth);
+        }
     }
 
     private static void drawArrowPair(GuiGraphics graphics, IActionBindingProvider provider,
@@ -126,7 +148,7 @@ public final class BattleRequestHud {
             return;
         }
         Button first = arrows.get(0);
-        int y = first.getY() + (first.getHeight() - HudLayout.GLYPH_SIZE) / 2;
+        int y = first.getY() + (first.getHeight() - SIDE_GLYPH_SIZE) / 2;
         drawOutside(graphics, glyphsOf(provider, previous.actionId()), panelLeft, panelWidth, true, y);
         drawOutside(graphics, glyphsOf(provider, next.actionId()), panelLeft, panelWidth, false, y);
     }
@@ -144,11 +166,11 @@ public final class BattleRequestHud {
         if (glyphs.isEmpty()) {
             return;
         }
-        int width = rowWidth(glyphs);
+        int width = rowWidth(glyphs, SIDE_GLYPH_SIZE);
         int x = toTheLeft
                 ? panelLeft - width - ARROW_GAP
                 : panelLeft + panelWidth + ARROW_GAP;
-        drawGlyphRow(graphics, glyphs, x, y);
+        drawGlyphRow(graphics, glyphs, x, y, SIDE_GLYPH_SIZE);
     }
 
     /** Bottom-left, dimmed while the hints are off so the way back stays visible. */

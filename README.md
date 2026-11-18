@@ -29,7 +29,9 @@ back button steps one page out (move/party → action menu) and only minimises a
 
 Showing or hiding the hints uses ControlFlex's own built-in `hud_toggle` action (0.13.0), not an
 action of ours — one binding works for every bridge. Its state is stored by ControlFlex per screen
-class, so the choice survives leaving the battle and restarting the game.
+class, so the choice survives leaving the battle and restarting the game. The toggle hint shares the
+bottom-left corner with Cobblemon's back arrow, so it is left out on the pages that draw that arrow
+(the move and party pages, and the action menu while the last choice can still be taken back).
 
 The radial interaction wheel (`InteractWheelGUI`) ships a compat entry instead of actions: its right
 stick runs in `RADIAL_PATH`, so a direction parks the cursor on that sector's button rather than
@@ -52,10 +54,12 @@ refreshes the button label, so the format the panel shows is always the format t
 level row mirrors that, without the label refresh — it only changes what the challenge carries. The
 press is refused while the button reports itself disabled.
 
-Hints are drawn on the controls themselves: one glyph outside the panel on each side per row, no
-caption, and the press glyph above the button it presses. Both sides measure from the panel edge
-(113 GUI px, the artwork's own width), so the format row and the level row line up. The toggle hint
-stays bottom-left, like the battle screen's.
+Hints are drawn on the controls themselves: one 16 px glyph outside the panel on each side per
+row, no caption, and the press glyph on the button's own line just past its label. Both sides
+measure from the panel edge (113 GUI px, the artwork's own width), so the format row and the level
+row line up. The level row only exists on pages that offer one — Cobblemon keeps its arrows in the
+screen after a cycle to the team page but disables them, so their hints are dropped there along
+with the row. The toggle hint stays bottom-left, like the battle screen's.
 
 ## How it works
 

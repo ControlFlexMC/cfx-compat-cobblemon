@@ -182,4 +182,24 @@ public final class HudLayout {
         }
         return new Rect(x, y, width, height);
     }
+
+    /**
+     * x of the request screen's confirm glyph when it sits beside the primary button's label.
+     *
+     * <p>The button does not centre its label on the button's own middle: {@code BattleRequestButton}
+     * is 69 px wide but draws the text centred on {@code x + 35}. The label's left edge is truncated
+     * ({@code width / 2}), so its right edge sits {@code ceil(width / 2)} past that centre; the glyph
+     * starts one {@link #GAP} later.</p>
+     *
+     * @param labelCenter x the button centres its label on
+     * @param labelWidth  measured advance of the label, in GUI px
+     */
+    public static int requestLabelBadgeX(int labelCenter, int labelWidth) {
+        return labelCenter + (labelWidth + 1) / 2 + GAP;
+    }
+
+    /** y of that glyph: centred on the button line rather than on the font's baseline. */
+    public static int requestLabelBadgeY(int buttonY, int buttonHeight, int glyphSize) {
+        return buttonY + (buttonHeight - glyphSize) / 2;
+    }
 }
