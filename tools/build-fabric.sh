@@ -11,7 +11,7 @@ cd "$PROJECT_DIR"
 
 JAR="$(ls -t "${PROJECT_DIR}"/fabric/build/libs/cfx-compat-cobblemon-*-fabric.jar | head -1)"
 
-INSTANCE="${COBBLEMON_1_20_1_FABRIC_PATH:-}"
+INSTANCE="${MC_1_20_1_FABRIC_PATH:-}"
 if [[ -z "${INSTANCE}" ]]; then
     echo "MC_1_20_1_FABRIC_PATH is not set; artifact left at ${JAR}"
     exit 0

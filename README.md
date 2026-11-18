@@ -64,7 +64,7 @@ Prerequisites: JDK 17 or 21 to run Gradle 8.8, and network access the first time
 
 ```bash
 ./tools/fetch-cobblemon.sh   # downloads the two 1.5.2 jars into libs/ and checks SHA-1
-./tools/build-forge.sh       # builds and deploys to the Forge test instance
+./tools/build-forge.sh       # builds; deploys only if an instance path is set
 ./tools/build-fabric.sh      # builds; deploys only if an instance path is set
 ```
 
@@ -74,12 +74,13 @@ Prerequisites: JDK 17 or 21 to run Gradle 8.8, and network access the first time
 Deploy targets:
 
 ```bash
-COBBLEMON_1_20_1_FORGE_PATH=/path/to/instance/minecraft ./tools/build-forge.sh
-COBBLEMON_1_20_1_FABRIC_PATH=/path/to/instance/minecraft ./tools/build-fabric.sh
+MC_1_20_1_FORGE_PATH=/path/to/instance/minecraft ./tools/build-forge.sh
+MC_1_20_1_FABRIC_PATH=/path/to/instance/minecraft ./tools/build-fabric.sh
 ```
 
-The default Forge target is `/Users/ifels/.prism/instances/cobblemon-1.20.1-forge/minecraft`.
-The scripts clear the instance's `logs/` before deploying so the next launch starts clean.
+With the variable unset, the script builds only and leaves the jar in `forge/build/libs`
+or `fabric/build/libs`. When deploying, the script clears the instance's `logs/` so the
+next launch starts clean.
 
 If `gradle` fails with `Unsupported class file major version`, point `JAVA_HOME` at a JDK 17 or 21
 (for example `/Library/Java/JavaVirtualMachines/microsoft-21.jdk/Contents/Home`).
