@@ -1,86 +1,27 @@
 #!/usr/bin/env bash
-# Build the Fabric (MC 1.21.1) artifact for cfx-compat-cobblemon.
-#
-# Usage:
-#   ./tools/build-fabric.sh
-#   ./tools/build-fabric.sh --release
-#   ./tools/build-fabric.sh --clean
-#
-# Environment:
-#   MC_1_21_1_FABRIC_PATH  instance dir (the one containing mods/); unset -> skip deploy
-#   RELEASE_DEPLOY_PATH    extra copy dest on --release; unset -> WARNING
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-
 cd "$PROJECT_DIR"
 
-RELEASE=false
-CLEAN=false
-EXTRA_ARGS=()
+"${PROJECT_DIR}/tools/fetch-cobblemon.sh"
 
-for arg in "$@"; do
-    case "$arg" in
-        --release) RELEASE=true ;;
-        --clean)   CLEAN=true ;;
-        *)         EXTRA_ARGS+=("$arg") ;;
-    esac
-done
+"${PROJECT_DIR}/gradlew" :fabric:build "$@"
 
-mod_version=$(grep -E '^mod_version=' gradle.properties | cut -d= -f2)
-mc_ver=$(grep -E '^minecraft_version=' gradle.properties | cut -d= -f2)
-NEW_JAR="${PROJECT_DIR}/fabric/build/libs/cfx-compat-cobblemon-${mod_version}-mc${mc_ver}-fabric.jar"
+JAR="$(ls -t "${PROJECT_DIR}"/fabric/build/libs/cfx-compat-cobblemon-*-fabric.jar | head -1)"
 
-echo "==> Fabric build: cfx-compat-cobblemon ${mod_version} (MC ${mc_ver})"
-
-if $CLEAN; then
-    echo "==> Cleaning first..."
-    ./gradlew clean
+INSTANCE="${MC_1_20_1_FABRIC_PATH:-}"
+if [[ -z "${INSTANCE}" ]]; then
+    echo "MC_1_20_1_FABRIC_PATH is not set; artifact left at ${JAR}"
+    exit 0
 fi
 
-gradle_cmd=(./gradlew :fabric:build)
-if [[ ${#EXTRA_ARGS[@]} -gt 0 ]]; then gradle_cmd+=("${EXTRA_ARGS[@]}"); fi
-echo "==> Running: ${gradle_cmd[*]}"
-"${gradle_cmd[@]}"
-
-if [[ ! -f "${NEW_JAR}" ]]; then
-    echo "JAR not found: ${NEW_JAR}"
-    exit 1
+MODS="${INSTANCE}/mods"
+mkdir -p "${MODS}"
+rm -f "${MODS}"/cfx-compat-cobblemon-*-fabric.jar
+cp "${JAR}" "${MODS}/"
+if [[ -d "${INSTANCE}/logs" ]]; then
+    rm -rf "${INSTANCE:?}/logs/"*
 fi
-
-echo ""
-echo "Build complete: $(basename "${NEW_JAR}")"
-
-MC_INSTANCE="${MC_1_21_1_FABRIC_PATH:-}"
-MODS_DIR="${MC_INSTANCE}/mods"
-
-if [[ -z "${MC_INSTANCE}" ]]; then
-    echo "MC_1_21_1_FABRIC_PATH is not set; skipping instance deploy"
-    echo "   artifact: ${NEW_JAR}"
-else
-    LOGS_DIR="${MC_INSTANCE}/logs"
-    if [[ -d "${LOGS_DIR}" ]]; then
-        rm -rf "${LOGS_DIR:?}"/*
-        echo "  cleared logs: ${LOGS_DIR}"
-    fi
-
-    if [[ -d "${MODS_DIR}" ]]; then
-        rm -f "${MODS_DIR}"/cfx-compat-cobblemon-*-mc*-fabric.jar
-        echo "  removed old cfx-compat-cobblemon Fabric jars"
-    fi
-
-    mkdir -p "${MODS_DIR}"
-    cp "${NEW_JAR}" "${MODS_DIR}/"
-    echo "  deployed: ${MODS_DIR}/$(basename "${NEW_JAR}")"
-fi
-
-if $RELEASE; then
-    if [[ -n "${RELEASE_DEPLOY_PATH:-}" ]]; then
-        mkdir -p "${RELEASE_DEPLOY_PATH}"
-        cp "${NEW_JAR}" "${RELEASE_DEPLOY_PATH}/"
-        echo "  release copy: ${RELEASE_DEPLOY_PATH}/$(basename "${NEW_JAR}")"
-    else
-        echo "RELEASE_DEPLOY_PATH is not set; skipping release copy"
-    fi
-fi
+echo "deployed $(basename "${JAR}") to ${MODS}"

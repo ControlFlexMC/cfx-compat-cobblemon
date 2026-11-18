@@ -12,10 +12,9 @@
           "rightStick": {
             "behavior": "RADIAL_PATH",
             "threshold": 0.5,
-            "cursorRadius": 65
+            "cursorRadius": 49
           }
-        },
-        "com.cobblemon.mod.common.client.gui.interact.battleRequest.BattleConfigureGUI": {}
+        }
       }
     }
   ]
