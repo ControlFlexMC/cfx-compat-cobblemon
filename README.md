@@ -83,7 +83,17 @@ with the row. The toggle hint stays bottom-left, like the battle screen's.
 ./tools/build-neoforge.sh  # MC_1_21_1_NEOFORGE_PATH=<instance>/minecraft to deploy
 ```
 
-The deploy step also clears the instance's `logs/`, so the next launch starts with a clean log.
+Both build scripts accept `--clean` (run `./gradlew clean` first) and `--release`
+(also copy the jar to `RELEASE_DEPLOY_PATH` when set). The Gradle build has no
+release switch, so the jar name is the same in both modes.
+
+```bash
+./tools/build-fabric.sh --clean
+./tools/build-neoforge.sh --release
+```
+
+The deploy step also clears the instance's `logs/` and `crash-reports/`, so the next
+launch starts clean.
 
 ## Layout
 

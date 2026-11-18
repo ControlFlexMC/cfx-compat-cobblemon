@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Build the NeoForge (MC 1.21.1) artifact for cfx-compat-cobblemon.
+# Mirrors cfx-compat-vehicles/tools/build-forge.sh, adjusted for this repository's
+# :neoforge: subproject and its own jar name.
 #
 # Usage:
 #   ./tools/build-neoforge.sh
@@ -7,8 +9,11 @@
 #   ./tools/build-neoforge.sh --clean
 #
 # Environment:
-#   MC_1_21_1_NEOFORGE_PATH  instance dir (the one containing mods/); unset -> skip deploy
+#   MC_1_21_1_NEOFORGE_PATH  instance dir; unset -> skip instance deploy (WARNING)
 #   RELEASE_DEPLOY_PATH      extra copy dest on --release; unset -> WARNING
+#
+# This branch's Gradle build has no release switch, so debug and release builds share
+# one jar name; --release only turns on the release copy.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -30,9 +35,10 @@ done
 
 mod_version=$(grep -E '^mod_version=' gradle.properties | cut -d= -f2)
 mc_ver=$(grep -E '^minecraft_version=' gradle.properties | cut -d= -f2)
-NEW_JAR="${PROJECT_DIR}/neoforge/build/libs/cfx-compat-cobblemon-${mod_version}-mc${mc_ver}-neoforge.jar"
+label="${mod_version}"
 
-echo "==> NeoForge build: cfx-compat-cobblemon ${mod_version} (MC ${mc_ver})"
+if $RELEASE; then build_type="Release"; else build_type="Debug"; fi
+echo "==> ${build_type} NeoForge build: version ${label}"
 
 if $CLEAN; then
     echo "==> Cleaning first..."
@@ -44,6 +50,7 @@ if [[ ${#EXTRA_ARGS[@]} -gt 0 ]]; then gradle_cmd+=("${EXTRA_ARGS[@]}"); fi
 echo "==> Running: ${gradle_cmd[*]}"
 "${gradle_cmd[@]}"
 
+NEW_JAR="${PROJECT_DIR}/neoforge/build/libs/cfx-compat-cobblemon-${label}-mc${mc_ver}-neoforge.jar"
 if [[ ! -f "${NEW_JAR}" ]]; then
     echo "JAR not found: ${NEW_JAR}"
     exit 1
@@ -53,20 +60,27 @@ echo ""
 echo "Build complete: $(basename "${NEW_JAR}")"
 
 MC_INSTANCE="${MC_1_21_1_NEOFORGE_PATH:-}"
-MODS_DIR="${MC_INSTANCE}/mods"
 
 if [[ -z "${MC_INSTANCE}" ]]; then
     echo "MC_1_21_1_NEOFORGE_PATH is not set; skipping instance deploy"
     echo "   artifact: ${NEW_JAR}"
 else
+    MODS_DIR="${MC_INSTANCE}/mods"
     LOGS_DIR="${MC_INSTANCE}/logs"
+
     if [[ -d "${LOGS_DIR}" ]]; then
         rm -rf "${LOGS_DIR:?}"/*
         echo "  cleared logs: ${LOGS_DIR}"
     fi
 
+    CRASH_DIR="${MC_INSTANCE}/crash-reports"
+    if [[ -d "${CRASH_DIR}" ]]; then
+        rm -rf "${CRASH_DIR:?}"/*
+        echo "  cleared crash-reports: ${CRASH_DIR}"
+    fi
+
     if [[ -d "${MODS_DIR}" ]]; then
-        rm -f "${MODS_DIR}"/cfx-compat-cobblemon-*-mc*-neoforge.jar
+        rm -f "${MODS_DIR}"/cfx-compat-cobblemon-*-neoforge.jar
         echo "  removed old cfx-compat-cobblemon NeoForge jars"
     fi
 
@@ -80,7 +94,7 @@ if $RELEASE; then
         mkdir -p "${RELEASE_DEPLOY_PATH}"
         cp "${NEW_JAR}" "${RELEASE_DEPLOY_PATH}/"
         echo "  release copy: ${RELEASE_DEPLOY_PATH}/$(basename "${NEW_JAR}")"
+    else
+        echo "RELEASE_DEPLOY_PATH is not set; skipping release copy"
     fi
-else
-    echo "RELEASE_DEPLOY_PATH is not set; skipping release copy"
 fi
