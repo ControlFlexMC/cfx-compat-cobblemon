@@ -1110,7 +1110,7 @@ Copy the 1.21.1 `BattleHud.java` and apply these exact changes:
 4. `BattleSelection.INSTANCE.sync(page.id(), slots.size(), kind == BattleSlots.PageKind.ROOT)`.
 5. `drawHighlight(graphics, rect, page.id(), selected)` (the page field is an `Object`).
 6. In `drawGlyphRow`, replace `ResourceLocation.parse(glyph.getTextureId())` with
-   `new ResourceLocation(glyph.getTextureId())`.
+   `ResourceLocation.tryParse(glyph.getTextureId())` and skip the blit when it returns null.
 7. Keep `HUD_TOGGLE_ACTION = "hud_toggle"` and `CONFIRM_ACTION = "gui_press"`.
 8. Keep `diagnoseOnce`, `resolveForSlot`, `rowWidth`, colors, and the toggle/nav hints, but change
    every remaining `BattleScreen.Slot`/`BattleScreen.PageKind` (including the `badged` list, the

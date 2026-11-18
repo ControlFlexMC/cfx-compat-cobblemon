@@ -447,8 +447,8 @@ HUD rendering is gated on `IActionBindingProvider`; no provider → nothing draw
 badges, and hints all resolve bindings live, so a rebind or controller swap shows on the next
 frame.
 
-Porting note: 1.20.1 has no `ResourceLocation.parse`; glyph textures are constructed with
-`new ResourceLocation(glyph.getTextureId())`. `GuiGraphics`, `graphics.pose()`, and the `blit` /
+Porting note: 1.20.1's `ResourceLocation` constructor is deprecated for removal; glyph textures use
+`ResourceLocation.tryParse(glyph.getTextureId())` with a null guard. `GuiGraphics`, `graphics.pose()`, and the `blit` /
 `drawString` overloads used by the 1.21.1 HUD exist unchanged in 1.20.1.
 
 ## 12. Error handling and logging
