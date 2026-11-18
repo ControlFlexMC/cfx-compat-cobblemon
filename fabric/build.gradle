@@ -22,16 +22,18 @@ loom {
     }
 }
 
-// The shared bridge lives in common/, tests included — both loaders run the same suite.
-sourceSets {
-    main {
-        java.srcDir(rootProject.file('common/src/main/java'))
-        resources.srcDir(rootProject.file('common/src/main/resources'))
-    }
-    test {
-        java.srcDir(rootProject.file('common/src/test/java'))
-        compileClasspath += sourceSets.main.output
-        runtimeClasspath += sourceSets.main.output
+// Task 1 compiles only the dependency spike. Task 2 removes this guard.
+if (!rootProject.hasProperty('spikeOnly')) {
+    sourceSets {
+        main {
+            java.srcDir(rootProject.file('common/src/main/java'))
+            resources.srcDir(rootProject.file('common/src/main/resources'))
+        }
+        test {
+            java.srcDir(rootProject.file('common/src/test/java'))
+            compileClasspath += sourceSets.main.output
+            runtimeClasspath += sourceSets.main.output
+        }
     }
 }
 
@@ -41,6 +43,11 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+def cobblemonJar = rootProject.file('libs/Cobblemon-fabric-1.5.2+1.20.1.jar')
+if (!cobblemonJar.exists()) {
+    throw new GradleException("Missing ${cobblemonJar}. Run ./tools/fetch-cobblemon.sh first.")
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.officialMojangMappings()
@@ -48,10 +55,9 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
 
-    // ControlFlex API (plain Java, loader-agnostic). Cobblemon is NOT a compile dependency:
-    // the bridge reaches it through reflection so one jar works on both loaders and across
-    // Cobblemon patch versions.
+    modCompileOnly files(cobblemonJar)
     compileOnly "com.github.ControlFlexMC:control-flex-api:${controlflex_api_version}"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:1.9.24"
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.slf4j:slf4j-api:2.0.9'

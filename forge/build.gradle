@@ -1,0 +1,101 @@
+plugins {
+    id 'net.neoforged.moddev.legacyforge'
+}
+
+base {
+    archivesName = 'cfx-compat-cobblemon'
+}
+
+version = "${mod_version}-mc${minecraft_version}-forge"
+group = maven_group
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
+}
+
+legacyForge {
+    version = "${minecraft_version}-${forge_version}"
+
+    runs {
+        client {
+            client()
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+// Task 1 compiles only the dependency spike. Task 2 removes this guard.
+if (!rootProject.hasProperty('spikeOnly')) {
+    sourceSets {
+        main {
+            java.srcDir(rootProject.file('common/src/main/java'))
+            resources.srcDir(rootProject.file('common/src/main/resources'))
+        }
+        test {
+            java.srcDir(rootProject.file('common/src/test/java'))
+            compileClasspath += sourceSets.main.output
+            runtimeClasspath += sourceSets.main.output
+        }
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+def cobblemonJar = rootProject.file('libs/Cobblemon-forge-1.5.2+1.20.1.jar')
+if (!cobblemonJar.exists()) {
+    throw new GradleException("Missing ${cobblemonJar}. Run ./tools/fetch-cobblemon.sh first.")
+}
+
+dependencies {
+    compileOnly files(cobblemonJar)
+    compileOnly "com.github.ControlFlexMC:control-flex-api:${controlflex_api_version}"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:1.9.24"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.slf4j:slf4j-api:2.0.9'
+    testImplementation "com.github.ControlFlexMC:control-flex-api:${controlflex_api_version}"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
+}
+
+processResources {
+    def expandProps = [
+        'mod_id'                         : mod_id,
+        'mod_name'                       : mod_name,
+        'mod_version'                    : mod_version,
+        'mod_authors'                    : mod_authors,
+        'mod_license'                    : mod_license,
+        'mod_description'                : mod_description,
+        'minecraft_version_range'        : minecraft_version_range,
+        'forge_version_range'            : forge_version_range,
+        'controlflex_mod_id'             : controlflex_mod_id,
+        'controlflex_version_range_forge': controlflex_version_range_forge,
+        'cobblemon_mod_id'               : cobblemon_mod_id,
+        'cobblemon_version_range_forge'  : cobblemon_version_range_forge,
+    ]
+
+    filesMatching(['pack.mcmeta', 'META-INF/mods.toml']) {
+        expand expandProps
+    }
+
+    inputs.properties(expandProps)
+}
+
+jar {
+    from(rootProject.file('LICENSE')) { rename { "${it}_${mod_id}" } }
+}

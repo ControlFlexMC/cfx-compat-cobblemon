@@ -58,7 +58,7 @@ mkdir -p "${LIBS_DIR}"
 
 FORGE_NAME="Cobblemon-forge-1.5.2+1.20.1.jar"
 FABRIC_NAME="Cobblemon-fabric-1.5.2+1.20.1.jar"
-FORGE_URL="https://cdn.modrinth.com/data/MdwFAVRL/versions/oNwbjxI6/Cobblemon-forge-1.5.2%2B1.20.1.jar"
+FORGE_URL="https://cdn.modrinth.com/data/MdwFAVRL/versions/vm5zUZAg/Cobblemon-forge-1.5.2%2B1.20.1.jar"
 FABRIC_URL="https://cdn.modrinth.com/data/MdwFAVRL/versions/EVozVxCq/Cobblemon-fabric-1.5.2%2B1.20.1.jar"
 FORGE_SHA1="02601f79f0c442b75463538da7a3c7f260fda42e"
 FABRIC_SHA1="2465e767f2659240f1c16549e602cb6e8b9145db"
