@@ -1420,7 +1420,7 @@ cd "$PROJECT_DIR"
 
 JAR="$(ls -t "${PROJECT_DIR}"/forge/build/libs/cfx-compat-cobblemon-*-forge.jar | head -1)"
 
-INSTANCE="${MC_1_20_1_FORGE_PATH:-/Users/ifels/.prism/instances/cobblemon-1.20.1-forge/minecraft}"
+INSTANCE="${COBBLEMON_1_20_1_FORGE_PATH:-/Users/ifels/.prism/instances/cobblemon-1.20.1-forge/minecraft}"
 MODS="${INSTANCE}/mods"
 mkdir -p "${MODS}"
 rm -f "${MODS}"/cfx-compat-cobblemon-*-forge.jar
@@ -1447,9 +1447,9 @@ cd "$PROJECT_DIR"
 
 JAR="$(ls -t "${PROJECT_DIR}"/fabric/build/libs/cfx-compat-cobblemon-*-fabric.jar | head -1)"
 
-INSTANCE="${MC_1_20_1_FABRIC_PATH:-}"
+INSTANCE="${COBBLEMON_1_20_1_FABRIC_PATH:-}"
 if [[ -z "${INSTANCE}" ]]; then
-    echo "MC_1_20_1_FABRIC_PATH is not set; artifact left at ${JAR}"
+    echo "COBBLEMON_1_20_1_FABRIC_PATH is not set; artifact left at ${JAR}"
     exit 0
 fi
 

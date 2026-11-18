@@ -1,94 +1,132 @@
 # cfx-compat-cobblemon
 
-ControlFlex bridge mod for [Cobblemon](https://modrinth.com/mod/cobblemon) battle screens.
+ControlFlex bridge mod for [Cobblemon](https://modrinth.com/mod/cobblemon) battle screens on
+Minecraft 1.20.1, for Forge and Fabric.
 
-Cobblemon's battle UI is pointer-only: the option tiles are not focusable widgets and only accept
-`mousePrimaryClicked(x, y)`, so a controller has to drag a cursor across the screen for every turn.
-This bridge turns "what can I do right now" into ordinary ControlFlex actions, replays the press as
-a click on the right tile, and draws the actually-bound button on each tile.
+Cobblemon's battle UI is pointer-only: the option tiles and move bars accept mouse clicks but are
+not focusable widgets. This bridge turns "what can I do right now" into ordinary ControlFlex
+actions, replays the press through Cobblemon's own click path, and draws the actually-bound
+button on each tile.
 
-MC 1.21.1, Fabric and NeoForge, requires ControlFlex API 0.9.2.2 or newer (native action
-registration and the per-screen handler registry).
+- Minecraft 1.20.1
+- Forge 47.4.4 or Fabric
+- Cobblemon 1.5.2+1.20.1
+- ControlFlex 0.9.0 or newer (API 0.9.2.2)
+
+## Why this branch compiles against Cobblemon
+
+Cobblemon 1.5.2 is the final Cobblemon release for 1.20.1, so this branch takes a direct
+`compileOnly` / `modCompileOnly` dependency instead of the reflection gateway used by the 1.21.1
+branch. That gives compile-time checked tile access and Cobblemon's own size constants. The
+trade-off is deliberate: another Cobblemon build may fail at class-load or link time rather than
+silently dropping actions. The 1.21.1 branch keeps the reflection approach for Cobblemon 1.8.
 
 ## Actions
 
-All 18 battle actions are declared for `BattleGUI` only, so ControlFlex lists them under
-Mods → Cobblemon → Screen 适配 → `BattleGUI` — that page is where they are bound, reset (back to
-the four defaults) or cleared. The same card's 按键绑定 tab lists every action of the mod.
+All 18 actions are declared for `BattleGUI`, so ControlFlex lists them under
+Mods → Cobblemon → Screen 适配 → `BattleGUI`.
 
 | Group | Actions | Fires on |
 | --- | --- | --- |
 | Root menu | `battle_fight` / `battle_switch` / `battle_capture` / `battle_run` | action menu |
-| Moves | `battle_move_1` … `battle_move_4` | move page, only the moves the Pokémon actually has |
+| Moves | `battle_move_1` … `battle_move_4` | move page, only selectable moves |
 | Party | `battle_party_1` … `battle_party_6` | party page, including forced switches |
-| Navigation | `battle_prev` / `battle_next` | any sub-page: walks the highlight and parks the cursor |
+| Navigation | `battle_prev` / `battle_next` | any page with more than one slot |
 | Log | `battle_log_up` / `battle_log_down` | any time the battle screen is open |
 
-Back is not an action either: the bridge registers a screen handler for `BattleGUI`, so the built-in
-back button steps one page out (move/party → action menu) and only minimises at the root.
+Defaults: `prev = LB`, `next = RB`, `log_up = right stick up`, `log_down = right stick down`.
+Everything else starts unbound.
 
-Showing or hiding the hints uses ControlFlex's own built-in `hud_toggle` action (0.13.0), not an
-action of ours — one binding works for every bridge. Its state is stored by ControlFlex per screen
-class, so the choice survives leaving the battle and restarting the game. The toggle hint shares the
-bottom-left corner with Cobblemon's back arrow, so it is left out on the pages that draw that arrow
-(the move and party pages, and the action menu while the last choice can still be taken back).
+- **Root tiles are semantic, not positional.** Cobblemon drops the party tile when the active
+  Pokémon is trapped, shifting the rest; the bridge maps fight / party / capture / run and forfeit
+  by icon texture.
+- **Per-tile actions click immediately** through `Screen.mouseClicked` at the tile centre, so
+  Cobblemon's own hit testing still rejects disabled moves and illegal targets.
+- **LB/RB** move the highlight and park the ControlFlex cursor on it, so the built-in `gui_press`
+  (A) activates the ringed tile.
+- **Back** is not an action: the bridge registers a screen handler for `BattleGUI`, so the built-in
+  back press steps one page out (move/party/confirm → action menu) and only minimises at the root.
+- **Confirmation page:** 1.5.2 has one `Forfeit` button. The cursor is parked on it, the HUD shows
+  the `gui_press` binding, A confirms and B cancels. There is no separate confirm action.
+- **Log** scrolls three rows per press.
+- **Hints:** a badge with the bound button on each tile, a ring on the current tile, an LB/RB hint
+  in the bottom-right and the built-in `hud_toggle` hint in the bottom-left. The toggle hint is
+  hidden on the pages where Cobblemon draws its own back arrow.
 
-The radial interaction wheel (`InteractWheelGUI`) ships a compat entry instead of actions: its right
-stick runs in `RADIAL_PATH`, so a direction parks the cursor on that sector's button rather than
-dragging across the ring. `cursorRadius` 65 sits between the wheel's dead centre (41 GUI px) and its
-outer ring (85 GUI px, `SIZE = 170`) — move it up or down in the per-screen page if a skin or a GUI
-scale puts the sectors somewhere else.
-
-## Battle request screen
-
-`BattleConfigureGUI` gets five actions of its own, scoped to that screen:
-
-| Action | Default | Does |
-| --- | --- | --- |
-| `battle_request_prev` / `battle_request_next` | LB / RB | step through the formats the server offered (single / double / triple / multi …) |
-| `battle_request_level_prev` / `battle_request_level_next` | D-pad ← / → | step through the level rule row ("no restriction", "set level" …) |
-| `battle_request_confirm` | Y | presses the primary button — challenge, accept, or invite, whatever it currently reads |
-
-Stepping calls the same `setCurrentPage` the on-screen arrows call (wrap-around included) and
-refreshes the button label, so the format the panel shows is always the format that gets sent. The
-level row mirrors that, without the label refresh — it only changes what the challenge carries. The
-press is refused while the button reports itself disabled.
-
-Hints are drawn on the controls themselves: one 16 px glyph outside the panel on each side per
-row, no caption, and the press glyph on the button's own line just past its label. Both sides
-measure from the panel edge (113 GUI px, the artwork's own width), so the format row and the level
-row line up. The level row only exists on pages that offer one — Cobblemon keeps its arrows in the
-screen after a cycle to the team page but disables them, so their hints are dropped there along
-with the row. The toggle hint stays bottom-left, like the battle screen's.
-
-## How it works
-
-- **No compile dependency on Cobblemon.** Fabric production jars are intermediary, NeoForge's are
-  official, so one artifact cannot compile against both. Cobblemon's own class and method names are
-  not remapped, so everything goes through reflection (`BattleScreen`) — a future Cobblemon that
-  moves these members loses the actions instead of throwing.
-- **Semantic, not positional.** Root tiles are identified by icon texture; `trapped` drops the party
-  tile and shifts the rest left, so a positional mapping would press capture where the player
-  expected the party page.
-- **Clicks go through Cobblemon's own hit testing** (`mousePrimaryClicked`), so disabled moves and
-  illegal targets are still rejected by Cobblemon.
-- **Hints are drawn by this mod**, not by ControlFlex: `IActionBindingProvider` resolves the bound
-  button, its glyph and the controller skin in one call, so a rebind or a controller swap shows up
-  on the next frame.
+The radial interaction wheel (`InteractWheelGUI`) ships a compat entry: its right stick runs in
+`RADIAL_PATH`, with `cursorRadius = 49` for the 138 px wheel (button centres sit
+`34.5 × √2 ≈ 48.8` px from the screen centre). Raise or lower it in the per-screen page if a skin
+or GUI scale moves the sectors.
 
 ## Building
 
+Prerequisites: JDK 17 or 21 to run Gradle 8.8, and network access the first time.
+
 ```bash
-./tools/build-fabric.sh    # MC_1_21_1_FABRIC_PATH=<instance>/minecraft to deploy
-./tools/build-neoforge.sh  # MC_1_21_1_NEOFORGE_PATH=<instance>/minecraft to deploy
+./tools/fetch-cobblemon.sh   # downloads the two 1.5.2 jars into libs/ and checks SHA-1
+./tools/build-forge.sh       # builds and deploys to the Forge test instance
+./tools/build-fabric.sh      # builds; deploys only if an instance path is set
 ```
 
-The deploy step also clears the instance's `logs/`, so the next launch starts with a clean log.
+`libs/` is gitignored. `fetch-cobblemon.sh` accepts `COBBLEMON_FORGE_JAR` and
+`COBBLEMON_FABRIC_JAR` to reuse existing copies, and `--force` to re-download.
+
+Deploy targets:
+
+```bash
+COBBLEMON_1_20_1_FORGE_PATH=/path/to/instance/minecraft ./tools/build-forge.sh
+COBBLEMON_1_20_1_FABRIC_PATH=/path/to/instance/minecraft ./tools/build-fabric.sh
+```
+
+The default Forge target is `/Users/ifels/.prism/instances/cobblemon-1.20.1-forge/minecraft`.
+The scripts clear the instance's `logs/` before deploying so the next launch starts clean.
+
+If `gradle` fails with `Unsupported class file major version`, point `JAVA_HOME` at a JDK 17 or 21
+(for example `/Library/Java/JavaVirtualMachines/microsoft-21.jdk/Contents/Home`).
+
+Tests:
+
+```bash
+./gradlew :forge:test :fabric:test
+```
+
+## Verification status
+
+- Both jars build: `cfx-compat-cobblemon-0.1.0-mc1.20.1-{forge,fabric}.jar`; neither contains
+  Cobblemon classes.
+- 38 unit tests pass (`BattleSlots`, `HudLayout`, `BattleSelection`, `BattleActions`,
+  `BattleAction`).
+- Forge load is verified on the instance with Cobblemon 1.5.2+1.20.1 and ControlFlex 0.9.0:
+  the log shows 18 registered actions, `screen handler ... registered=true`, and the compat config
+  matched for `cobblemon v1.5.2+1.20.1`.
+- In-battle controller scenarios (root, moves, party, forfeit, log scroll, HUD toggle, wheel) are
+  the manual checklist; they are not automated.
+- Fabric runtime is not verified: there is no Fabric test instance here, and ControlFlex's Fabric
+  0.9.0 jar has not been built locally. Fabric is covered by the build and the shared unit tests.
+
+## Differences from the 1.21.1 branch
+
+- 18 actions instead of 23: 1.5.2 has no battle-request screen, so the five
+  `battle_request_*` actions and the `BattleConfigureGUI` compat entry are gone.
+- No reflection in the battle gateway; `BattleScreen` is a typed adapter compiled against 1.5.2.
+- HUD layout uses 1.5.2's tile sizes (root 90×26, move 92×24, party 131×40) and puts party badges
+  in the bottom-right band.
+- Wheel `cursorRadius` is 49 instead of 65.
 
 ## Layout
 
 ```
-common/    actions, reflection gateway, ticker, HUD  (loader-neutral)
-fabric/    entry point + fabric.mod.json
-neoforge/  entry point + neoforge.mods.toml
+common/   actions, BattleSlots model, BattleScreen adapter, selection, ticker, HUD
+forge/    @Mod entry point, mods.toml, Forge event wiring
+fabric/   ClientModInitializer, fabric.mod.json, Fabric event wiring
+tools/    fetch-cobblemon.sh, build-forge.sh, build-fabric.sh
 ```
+
+## Out of scope
+
+- The 1.21.1 battle-request screen and its five actions.
+- Dynamax/Z gimmick buttons on the move page (mouse-only).
+- The spectator back button.
+- Cobblemon 1.6+ (not available for 1.20.1) and other Cobblemon UIs.
+- Controller cursor behaviour itself (ControlFlex owns it).
+- Localization beyond `en_us`/`zh_cn`.
