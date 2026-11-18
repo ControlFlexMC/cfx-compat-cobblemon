@@ -99,8 +99,12 @@ Tests:
 - Forge load is verified on the instance with Cobblemon 1.5.2+1.20.1 and ControlFlex 0.9.0:
   the log shows 18 registered actions, `screen handler ... registered=true`, and the compat config
   matched for `cobblemon v1.5.2+1.20.1`.
-- In-battle controller scenarios (root, moves, party, forfeit, log scroll, HUD toggle, wheel) are
-  the manual checklist; they are not automated.
+- Forge in-game verification passed on 2026-11-18. The acceptance log covers the four-tile root
+  menu and the three-tile trapped variant, Fight → move page and `battle_move_1`, the party page
+  opened from Switch (5 slots), B back to the action menu, five HUD hide/show cycles, and the
+  interaction wheel's `right=RADIAL_PATH` entry. No gateway warnings or exceptions were logged.
+- The forfeit confirmation and log scrolling were not exercised in that acceptance log; they share
+  the same page/extraction pipeline but remain the two in-game paths without captured evidence.
 - Fabric runtime is not verified: there is no Fabric test instance here, and ControlFlex's Fabric
   0.9.0 jar has not been built locally. Fabric is covered by the build and the shared unit tests.
 
