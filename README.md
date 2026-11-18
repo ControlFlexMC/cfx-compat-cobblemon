@@ -68,6 +68,15 @@ Prerequisites: JDK 17 or 21 to run Gradle 8.8, and network access the first time
 ./tools/build-fabric.sh      # builds; deploys only if an instance path is set
 ```
 
+Both build scripts accept `--clean` (run `./gradlew clean` first) and `--release`
+(also copy the jar to `RELEASE_DEPLOY_PATH` when set). The Gradle build has no
+release switch, so the jar name is the same in both modes.
+
+```bash
+./tools/build-forge.sh --clean
+./tools/build-fabric.sh --release
+```
+
 `libs/` is gitignored. `fetch-cobblemon.sh` accepts `COBBLEMON_FORGE_JAR` and
 `COBBLEMON_FABRIC_JAR` to reuse existing copies, and `--force` to re-download.
 
@@ -78,9 +87,10 @@ MC_1_20_1_FORGE_PATH=/path/to/instance/minecraft ./tools/build-forge.sh
 MC_1_20_1_FABRIC_PATH=/path/to/instance/minecraft ./tools/build-fabric.sh
 ```
 
-With the variable unset, the script builds only and leaves the jar in `forge/build/libs`
-or `fabric/build/libs`. When deploying, the script clears the instance's `logs/` so the
-next launch starts clean.
+With the instance variable unset, the script builds only and leaves the jar in
+`forge/build/libs` or `fabric/build/libs`. When deploying, the script clears the
+instance's `logs/` and `crash-reports/` so the next launch starts clean.
+`RELEASE_DEPLOY_PATH` is only used by `--release`.
 
 If `gradle` fails with `Unsupported class file major version`, point `JAVA_HOME` at a JDK 17 or 21
 (for example `/Library/Java/JavaVirtualMachines/microsoft-21.jdk/Contents/Home`).
