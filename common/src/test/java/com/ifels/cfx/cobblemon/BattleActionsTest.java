@@ -47,7 +47,7 @@ class BattleActionsTest {
             assertTrue(registration.actionId().startsWith("cfx_compat_cobblemon:"),
                     registration.actionId());
             assertEquals(java.util.EnumSet.of(ActionLayer.SCREEN), registration.layers());
-            assertEquals(List.of(BattleScreen.GUI_CLASS), registration.targetClasses());
+            assertEquals(List.of(BattleSlots.BATTLE_GUI_CLASS), registration.targetClasses());
             assertEquals("cobblemon", registration.groupModId());
         }
     }

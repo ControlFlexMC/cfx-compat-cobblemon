@@ -26,7 +26,7 @@ public final class BattleActions {
                     .nameKey(action.id())
                     .groupModId("cobblemon")
                     .layer(ActionLayer.SCREEN)
-                    .targetClass(BattleScreen.GUI_CLASS);
+                    .targetClass(BattleSlots.BATTLE_GUI_CLASS);
             DefaultBinding defaultBinding = defaultBinding(action);
             if (defaultBinding != null) {
                 builder.defaultBinding(defaultBinding);
