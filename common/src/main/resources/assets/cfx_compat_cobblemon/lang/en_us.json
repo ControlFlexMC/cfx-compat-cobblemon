@@ -18,7 +18,10 @@
   "key.cfx_compat_cobblemon.battle_next": "Next Option",
   "key.cfx_compat_cobblemon.battle_log_up": "Log Scroll Up",
   "key.cfx_compat_cobblemon.battle_log_down": "Log Scroll Down",
+  "key.cfx_compat_cobblemon.summary_tab_prev": "Previous Tab",
+  "key.cfx_compat_cobblemon.summary_tab_next": "Next Tab",
   "cfx_compat_cobblemon.hud.prev_next": "Cycle options",
+  "cfx_compat_cobblemon.hud.tab_switch": "Switch tab",
   "cfx_compat_cobblemon.hud.toggle.hide": "Hide hints",
   "cfx_compat_cobblemon.hud.toggle.show": "Show hints"
 }

@@ -2,6 +2,7 @@ package com.ifels.cfx.cobblemon.forge;
 
 import com.ifels.cfx.cobblemon.BattleHud;
 import com.ifels.cfx.cobblemon.BattleTicker;
+import com.ifels.cfx.cobblemon.SummaryHud;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
@@ -28,5 +29,6 @@ public final class CfxCobblemonForge {
     @SubscribeEvent
     public static void onScreenRender(ScreenEvent.Render.Post event) {
         BattleHud.render(event.getGuiGraphics(), event.getScreen());
+        SummaryHud.render(event.getGuiGraphics(), event.getScreen());
     }
 }

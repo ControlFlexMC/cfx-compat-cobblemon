@@ -8,8 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ControlFlex SPI entry point: installs the screen compat file, declares the 18 battle actions,
- * and registers the {@code BattleGUI} screen handler once ControlFlex is ready.
+ * ControlFlex SPI entry point: installs the screen compat file, declares the 18 battle actions and
+ * the 2 summary-tab actions, and registers the {@code BattleGUI} and {@code Summary} screen
+ * handlers once ControlFlex is ready.
  */
 public final class CfxCobblemonPlugin implements IControlFlexPlugin {
 
@@ -27,16 +28,19 @@ public final class CfxCobblemonPlugin implements IControlFlexPlugin {
     @Override
     public void onInstallCompatConfigs(ICompatAssetInstaller installer) {
         if (!installer.install(COMPAT_RESOURCE, COMPAT_FILE_NAME)) {
-            LOGGER.warn("[cfx-compat-cobblemon] failed to install {} — BattleGUI will not be listed "
-                    + "under Cobblemon → Screen 适配", COMPAT_FILE_NAME);
+            LOGGER.warn("[cfx-compat-cobblemon] failed to install {} — the Cobblemon screen pages "
+                            + "will not be listed under Cobblemon → Screen 适配, so the battle and "
+                            + "summary actions cannot be rebound per screen",
+                    COMPAT_FILE_NAME);
         }
     }
 
     @Override
     public void onRegisterActions(IActionRegistrar registrar) {
         BattleActions.register(registrar);
-        LOGGER.info("[cfx-compat-cobblemon] declared {} battle actions",
-                BattleAction.values().length);
+        SummaryActions.register(registrar);
+        LOGGER.info("[cfx-compat-cobblemon] declared {} battle actions and {} summary actions",
+                BattleAction.values().length, SummaryAction.values().length);
     }
 
     @Override
@@ -44,13 +48,20 @@ public final class CfxCobblemonPlugin implements IControlFlexPlugin {
         BattleAction action = BattleActions.byId(trigger.actionId());
         if (action != null) {
             BattleActionHandler.handle(action);
+            return;
+        }
+        SummaryAction summary = SummaryActions.byId(trigger.actionId());
+        if (summary != null) {
+            SummaryActionHandler.handle(summary);
         }
     }
 
     @Override
     public void onControlFlexReady() {
-        LOGGER.info("[cfx-compat-cobblemon] ControlFlex ready; {} battle actions available",
-                BattleAction.values().length);
+        LOGGER.info("[cfx-compat-cobblemon] ControlFlex ready; {} battle actions and {} summary "
+                        + "actions available",
+                BattleAction.values().length, SummaryAction.values().length);
         BattleScreenHandler.register();
+        SummaryScreenHandler.register();
     }
 }

@@ -1,7 +1,7 @@
 # cfx-compat-cobblemon
 
-ControlFlex bridge mod for [Cobblemon](https://modrinth.com/mod/cobblemon) battle screens on
-Minecraft 1.20.1, for Forge and Fabric.
+ControlFlex bridge mod for [Cobblemon](https://modrinth.com/mod/cobblemon) battle and summary
+screens on Minecraft 1.20.1, for Forge and Fabric.
 
 Cobblemon's battle UI is pointer-only: the option tiles and move bars accept mouse clicks but are
 not focusable widgets. This bridge turns "what can I do right now" into ordinary ControlFlex
@@ -23,7 +23,7 @@ silently dropping actions. The 1.21.1 branch keeps the reflection approach for C
 
 ## Actions
 
-All 18 actions are declared for `BattleGUI`, so ControlFlex lists them under
+The 18 battle actions are declared for `BattleGUI`, so ControlFlex lists them under
 Mods → Cobblemon → Screen 适配 → `BattleGUI`.
 
 | Group | Actions | Fires on |
@@ -57,6 +57,24 @@ The radial interaction wheel (`InteractWheelGUI`) ships a compat entry: its righ
 `RADIAL_PATH`, with `cursorRadius = 49` for the 138 px wheel (button centres sit
 `34.5 × √2 ≈ 48.8` px from the screen centre). Raise or lower it in the per-screen page if a skin
 or GUI scale moves the sectors.
+
+## Summary screen
+
+`Summary` gets two actions of its own, scoped to that screen:
+
+| Action | Default | Does |
+| --- | --- | --- |
+| `summary_tab_prev` / `summary_tab_next` | LB / RB | step through the three tabs (Info / Moves / Stats), wrapping at both ends |
+
+1.5.2's tabs are ordinary buttons whose press plays the click sound and calls Cobblemon's
+`displayMainScreen`; a step presses the tab itself, so the mouse and the bumpers take the same
+path. The open tab is read from the tab's own private `isActive` flag, falling back to the page
+index stored on the screen.
+
+Hints are the battle screen's corner pair: `hud_toggle` bottom-left, LB/RB + "Switch tab"
+bottom-right. A `Summary` screen handler makes the toggle work per screen class, and Escape still
+closes the summary. The party slots, moves and buttons stay cursor clicks — only the tab row is
+exposed to the bumpers.
 
 ## Building
 
@@ -103,27 +121,34 @@ Tests:
 
 ## Verification status
 
-- Both jars build: `cfx-compat-cobblemon-0.1.0-mc1.20.1-{forge,fabric}.jar`; neither contains
+- Both jars build: `cfx-compat-cobblemon-0.9.0-mc1.20.1-{forge,fabric}.jar`; neither contains
   Cobblemon classes.
-- 38 unit tests pass (`BattleSlots`, `HudLayout`, `BattleSelection`, `BattleActions`,
-  `BattleAction`).
+- 45 unit tests pass (`BattleSlots`, `SummaryTabs`, `HudLayout`, `BattleSelection`,
+  `BattleActions`, `SummaryActions`, `BattleAction`).
 - Forge load is verified on the instance with Cobblemon 1.5.2+1.20.1 and ControlFlex 0.9.0:
-  the log shows 18 registered actions, `screen handler ... registered=true`, and the compat config
-  matched for `cobblemon v1.5.2+1.20.1`.
+  the 0.9.0 acceptance log shows 18 registered actions, `screen handler ... registered=true`, and
+  the compat config matched for `cobblemon v1.5.2+1.20.1`. The two summary actions and the
+  `Summary` handler are added on top of that log and still need an in-game run.
 - Forge in-game verification passed on 2026-11-18. The acceptance log covers the four-tile root
   menu and the three-tile trapped variant, Fight → move page and `battle_move_1`, the party page
   opened from Switch (5 slots), B back to the action menu, five HUD hide/show cycles, and the
   interaction wheel's `right=RADIAL_PATH` entry. No gateway warnings or exceptions were logged.
 - The forfeit confirmation and log scrolling were not exercised in that acceptance log; they share
   the same page/extraction pipeline but remain the two in-game paths without captured evidence.
+- Summary tab switching, the corner hints and the per-screen toggle are covered by the build and
+  unit tests (tab stepping, action registration); they have not yet been captured in an in-game
+  acceptance log.
 - Fabric runtime is not verified: there is no Fabric test instance here, and ControlFlex's Fabric
   0.9.0 jar has not been built locally. Fabric is covered by the build and the shared unit tests.
 
 ## Differences from the 1.21.1 branch
 
-- 18 actions instead of 23: 1.5.2 has no battle-request screen, so the five
-  `battle_request_*` actions and the `BattleConfigureGUI` compat entry are gone.
-- No reflection in the battle gateway; `BattleScreen` is a typed adapter compiled against 1.5.2.
+- 20 actions instead of 25: 1.5.2 has no battle-request screen, so the five
+  `battle_request_*` actions and the `BattleConfigureGUI` compat entry are gone; both branches
+  carry the two summary-tab actions.
+- No reflection in the battle or summary gateway; `BattleScreen` and `SummaryScreen` are typed
+  adapters compiled against 1.5.2.
+- 1.5.2's summary has three tabs (Info / Moves / Stats) instead of the 1.21.1 branch's four.
 - HUD layout uses 1.5.2's tile sizes (root 90×26, move 92×24, party 131×40) and puts party badges
   in the bottom-right band.
 - Wheel `cursorRadius` is 49 instead of 65.
@@ -131,7 +156,7 @@ Tests:
 ## Layout
 
 ```
-common/   actions, BattleSlots model, BattleScreen adapter, selection, ticker, HUD
+common/   actions, BattleSlots/SummaryTabs models, typed adapters, selection, ticker, HUDs
 forge/    @Mod entry point, mods.toml, Forge event wiring
 fabric/   ClientModInitializer, fabric.mod.json, Fabric event wiring
 tools/    fetch-cobblemon.sh, build-forge.sh, build-fabric.sh
@@ -142,6 +167,8 @@ tools/    fetch-cobblemon.sh, build-forge.sh, build-fabric.sh
 - The 1.21.1 battle-request screen and its five actions.
 - Dynamax/Z gimmick buttons on the move page (mouse-only).
 - The spectator back button.
-- Cobblemon 1.6+ (not available for 1.20.1) and other Cobblemon UIs.
+- The summary's party slots, moves and evolve button — still cursor clicks; only its tab row is on
+  the bumpers.
+- Cobblemon 1.6+ (not available for 1.20.1) and other Cobblemon UIs (party, PC, Pokédex).
 - Controller cursor behaviour itself (ControlFlex owns it).
 - Localization beyond `en_us`/`zh_cn`.
