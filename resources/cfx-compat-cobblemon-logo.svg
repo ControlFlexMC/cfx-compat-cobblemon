@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
-<title id="title">CFX × Cobblemon Compat</title>
+<title id="title">CFX × Cobblemon Compat — Emerald</title>
 <desc id="desc">Pixel-art compatibility logo: a Poké Ball above a game controller inside a glowing red diamond, captioned CFX × COBBLEMON COMPAT.</desc>
 
 <defs>
@@ -9,9 +9,9 @@
     <stop offset="1" stop-color="#221b1c"/>
   </radialGradient>
   <radialGradient id="ambient" cx="50%" cy="50%" r="50%">
-    <stop offset="0" stop-color="#ff2a17" stop-opacity="0.16"/>
-    <stop offset="0.5" stop-color="#c2180f" stop-opacity="0.08"/>
-    <stop offset="1" stop-color="#c2180f" stop-opacity="0"/>
+    <stop offset="0" stop-color="#34d399" stop-opacity="0.16"/>
+    <stop offset="0.5" stop-color="#065f46" stop-opacity="0.08"/>
+    <stop offset="1" stop-color="#065f46" stop-opacity="0"/>
   </radialGradient>
   <linearGradient id="ballRed" x1="0.12" y1="0" x2="0.72" y2="1">
     <stop offset="0" stop-color="#e84437"/>
@@ -74,15 +74,15 @@
 <rect width="1024" height="1024" fill="url(#bg)"/>
 <path d="M0 0V1024M0 0H1024M48 0V1024M0 48H1024M96 0V1024M0 96H1024M144 0V1024M0 144H1024M192 0V1024M0 192H1024M240 0V1024M0 240H1024M288 0V1024M0 288H1024M336 0V1024M0 336H1024M384 0V1024M0 384H1024M432 0V1024M0 432H1024M480 0V1024M0 480H1024M528 0V1024M0 528H1024M576 0V1024M0 576H1024M624 0V1024M0 624H1024M672 0V1024M0 672H1024M720 0V1024M0 720H1024M768 0V1024M0 768H1024M816 0V1024M0 816H1024M864 0V1024M0 864H1024M912 0V1024M0 912H1024M960 0V1024M0 960H1024M1008 0V1024M0 1008H1024" stroke="#ffffff" stroke-opacity="0.085" stroke-width="1" fill="none"/>
 <circle cx="512" cy="500" r="520" fill="url(#ambient)"/>
-<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="#160e0f" fill-opacity="0.5"/>
+<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="#0a1512" fill-opacity="0.5"/>
 <g filter="url(#neon)">
-<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="none" stroke="#ff1c0c" stroke-width="15" stroke-opacity="0.5" stroke-linejoin="round"/>
-<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="none" stroke="#ff3a22" stroke-width="4.8" stroke-linejoin="round"/>
+<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="none" stroke="#059669" stroke-width="15" stroke-opacity="0.5" stroke-linejoin="round"/>
+<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="none" stroke="#34d399" stroke-width="4.8" stroke-linejoin="round"/>
 </g>
-<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="none" stroke="#ff7a5c" stroke-width="2.6" stroke-linejoin="round" opacity="0.95"/>
-<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="none" stroke="#ffd8c8" stroke-width="1.7" stroke-linejoin="round" opacity="0.75"/>
-<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="none" stroke="#ffe4d8" stroke-width="2.1" stroke-linejoin="round" stroke-dasharray="3.2 4.6" opacity="0.95"/>
-<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="none" stroke="#ffb9a4" stroke-width="4.2" stroke-linejoin="round" stroke-dasharray="3.2 4.6" opacity="0.5"/>
+<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="none" stroke="#6ee7b7" stroke-width="2.6" stroke-linejoin="round" opacity="0.95"/>
+<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="none" stroke="#ecfdf5" stroke-width="1.7" stroke-linejoin="round" opacity="0.75"/>
+<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="none" stroke="#d1fae5" stroke-width="2.1" stroke-linejoin="round" stroke-dasharray="3.2 4.6" opacity="0.95"/>
+<path d="M528 112L906 493V525L528 906H496L118 525V493L496 112Z" fill="none" stroke="#a7f3d0" stroke-width="4.2" stroke-linejoin="round" stroke-dasharray="3.2 4.6" opacity="0.5"/>
 <path d="M477 218L547 218L547 228L577 228L577 238L587 238L587 248L597 248L597 258L607 258L607 268L617 268L617 278L627 278L627 308L637 308L637 378L627 378L627 408L617 408L617 418L607 418L607 428L597 428L597 438L587 438L587 448L577 448L577 458L547 458L547 468L477 468L477 458L447 458L447 448L437 448L437 438L427 438L427 428L417 428L417 418L407 418L407 408L397 408L397 378L387 378L387 308L397 308L397 278L407 278L407 268L417 268L417 258L427 258L427 248L437 248L437 238L447 238L447 228L477 228Z" fill="#050404" opacity="0.4" filter="url(#dropShadow)" transform="translate(2 8)"/>
 <g>
 <path d="M477 218L547 218L547 228L577 228L577 238L587 238L587 248L597 248L597 258L607 258L607 268L617 268L617 278L627 278L627 308L637 308L637 378L627 378L627 408L617 408L617 418L607 418L607 428L597 428L597 438L587 438L587 448L577 448L577 458L547 458L547 468L477 468L477 458L447 458L447 448L437 448L437 438L427 438L427 428L417 428L417 418L407 418L407 408L397 408L397 378L387 378L387 308L397 308L397 278L407 278L407 268L417 268L417 258L427 258L427 248L437 248L437 238L447 238L447 228L477 228Z" fill="#0b0a0a"/>
