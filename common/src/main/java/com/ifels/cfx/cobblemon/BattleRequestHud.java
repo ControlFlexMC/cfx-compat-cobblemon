@@ -15,10 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static com.ifels.cfx.cobblemon.BattleHud.HUD_TOGGLE_ACTION;
-import static com.ifels.cfx.cobblemon.BattleHud.NAV_MARGIN;
-import static com.ifels.cfx.cobblemon.BattleHud.NAV_TEXT;
-import static com.ifels.cfx.cobblemon.BattleHud.NAV_TEXT_OFF;
 import static com.ifels.cfx.cobblemon.BattleHud.drawGlyphRow;
 import static com.ifels.cfx.cobblemon.BattleHud.rowWidth;
 
@@ -64,7 +60,7 @@ public final class BattleRequestHud {
             return;
         }
         // Drawn before the gate on purpose: it is the way back when the hints are off.
-        drawHudToggleHint(graphics, screen, provider);
+        BattleHud.drawToggleHint(graphics, screen, provider, visible);
         if (!visible) {
             return;
         }
@@ -171,26 +167,6 @@ public final class BattleRequestHud {
                 ? panelLeft - width - ARROW_GAP
                 : panelLeft + panelWidth + ARROW_GAP;
         drawGlyphRow(graphics, glyphs, x, y, SIDE_GLYPH_SIZE);
-    }
-
-    /** Bottom-left, dimmed while the hints are off so the way back stays visible. */
-    private static void drawHudToggleHint(GuiGraphics graphics, Screen screen,
-                                           IActionBindingProvider provider) {
-        IActionBindingInfo info = provider.getActiveBinding(HUD_TOGGLE_ACTION);
-        if (info == null || !info.isBound() || info.getGlyphs().isEmpty()) {
-            return;
-        }
-        Minecraft mc = Minecraft.getInstance();
-        String label = Component.translatable(visible
-                ? "cfx_compat_cobblemon.hud.toggle.hide"
-                : "cfx_compat_cobblemon.hud.toggle.show").getString();
-        int y = screen.height - NAV_MARGIN - HudLayout.GLYPH_SIZE;
-        int cursor = drawGlyphRow(graphics, info.getGlyphs(), NAV_MARGIN, y);
-        if (!label.isEmpty()) {
-            cursor += mc.font.width(" ");
-            graphics.drawString(mc.font, label, cursor, y + 1,
-                    visible ? NAV_TEXT : NAV_TEXT_OFF, false);
-        }
     }
 
     private static List<IControllerGlyph> glyphsOf(IActionBindingProvider provider, String actionId) {

@@ -212,15 +212,7 @@ public final class BattleHud {
     }
 
     /**
-     * The LB/RB hint, parked in the screen's bottom-right corner.
-     *
-     * <p>Not a per-tile hint: prev/next act on the list, not on one option, so repeating them on
-     * every tile would be noise. The corner is the only place the battle screen leaves empty —
-     * the message pane sits above it and the party bar is centred.</p>
-     *
-     * <p>The two buttons are separated by a slash rather than drawn adjacent: side by side with
-     * nothing between reads as a chord (press both at once), which is the opposite of what these
-     * do. The trailing label says what they switch.</p>
+     * The battle screen's LB/RB hint: the shared bottom-right row, labelled "cycle options".
      */
     private static void drawPageNavHint(GuiGraphics graphics, Screen screen,
                                         IActionBindingProvider provider, int slotCount) {
@@ -229,12 +221,30 @@ public final class BattleHud {
         }
         List<IControllerGlyph> prev = glyphsOf(provider, BattleAction.PREV);
         List<IControllerGlyph> next = glyphsOf(provider, BattleAction.NEXT);
+        String label = Component.translatable("cfx_compat_cobblemon.hud.prev_next").getString();
+        drawPrevNextHint(graphics, screen, prev, next, label);
+    }
+
+    /**
+     * The bottom-right "prev / next + label" row, shared by every screen this bridge speaks for.
+     *
+     * <p>Not a per-tile hint: prev/next act on the list, not on one option, so repeating them on
+     * every tile would be noise. The corner is the only place these screens leave empty — the
+     * battle's message pane sits above it, the request panel is centred, and the summary panel
+     * stops short of it.</p>
+     *
+     * <p>The two buttons are separated by a slash rather than drawn adjacent: side by side with
+     * nothing between reads as a chord (press both at once), which is the opposite of what these
+     * do. The trailing label says what they switch.</p>
+     */
+    static void drawPrevNextHint(GuiGraphics graphics, Screen screen,
+                                 List<IControllerGlyph> prev, List<IControllerGlyph> next,
+                                 String label) {
         if (prev.isEmpty() && next.isEmpty()) {
             return;
         }
 
         Minecraft mc = Minecraft.getInstance();
-        String label = Component.translatable("cfx_compat_cobblemon.hud.prev_next").getString();
         String slash = "/";
         String gap = " ";
 
@@ -263,18 +273,31 @@ public final class BattleHud {
     }
 
     /**
-     * Bottom-left, on the same baseline as the LB/RB hint: which key turns this overlay on and off.
+     * Battle screen's bottom-left hint, on the same baseline as the LB/RB hint: which key turns
+     * this overlay on and off.
      *
-     * <p>Drawn even while the hints are hidden (dimmed) — otherwise the one control the player
-     * needs to bring them back would disappear together with them. Skipped while Cobblemon draws
-     * its own back arrow in the same corner: the two would overprint each other, and the arrow is
-     * the button the player is more likely to want there.</p>
+     * <p>Skipped while Cobblemon draws its own back arrow in the same corner: the two would
+     * overprint each other, and the arrow is the button the player is more likely to want
+     * there.</p>
      */
     private static void drawHudToggleHint(GuiGraphics graphics, Screen screen,
                                           IActionBindingProvider provider, boolean backArrowShown) {
         if (backArrowShown) {
             return;
         }
+        drawToggleHint(graphics, screen, provider, visible);
+    }
+
+    /**
+     * The bottom-left "hide / show hints" row, shared by every screen this bridge speaks for.
+     *
+     * <p>Drawn even while the hints are hidden (dimmed) — otherwise the one control the player
+     * needs to bring them back would disappear together with them.</p>
+     *
+     * @param hintsVisible whether the hints are currently shown; label and tint follow it
+     */
+    static void drawToggleHint(GuiGraphics graphics, Screen screen,
+                               IActionBindingProvider provider, boolean hintsVisible) {
         IActionBindingInfo info = provider.getActiveBinding(HUD_TOGGLE_ACTION);
         if (info == null || !info.isBound() || info.getGlyphs().isEmpty()) {
             return;
@@ -283,7 +306,7 @@ public final class BattleHud {
         // The label names the action, not the subject: pressing this either hides or shows the
         // hints, so the two states mean opposite things. A static noun read as a status line
         // rather than a prompt ("Hints" told the player nothing about what the button does).
-        String label = Component.translatable(visible
+        String label = Component.translatable(hintsVisible
                 ? "cfx_compat_cobblemon.hud.toggle.hide"
                 : "cfx_compat_cobblemon.hud.toggle.show").getString();
         int y = screen.height - NAV_MARGIN - HudLayout.GLYPH_SIZE;
@@ -291,7 +314,7 @@ public final class BattleHud {
         if (!label.isEmpty()) {
             cursor += mc.font.width(" ");
             graphics.drawString(mc.font, label, cursor, y + 1,
-                    visible ? NAV_TEXT : NAV_TEXT_OFF, false);
+                    hintsVisible ? NAV_TEXT : NAV_TEXT_OFF, false);
         }
     }
 

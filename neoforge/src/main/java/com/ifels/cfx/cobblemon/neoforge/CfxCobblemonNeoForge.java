@@ -3,6 +3,7 @@ package com.ifels.cfx.cobblemon.neoforge;
 import com.ifels.cfx.cobblemon.BattleHud;
 import com.ifels.cfx.cobblemon.BattleRequestHud;
 import com.ifels.cfx.cobblemon.BattleTicker;
+import com.ifels.cfx.cobblemon.SummaryHud;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -38,5 +39,6 @@ public final class CfxCobblemonNeoForge {
     public static void onScreenRender(ScreenEvent.Render.Post event) {
         BattleHud.render(event.getGuiGraphics(), event.getScreen());
         BattleRequestHud.render(event.getGuiGraphics(), event.getScreen());
+        SummaryHud.render(event.getGuiGraphics(), event.getScreen());
     }
 }

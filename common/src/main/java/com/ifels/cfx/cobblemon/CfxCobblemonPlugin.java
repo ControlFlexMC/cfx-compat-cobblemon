@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 /**
  * ControlFlex SPI entry point.
  *
- * <p>Installs the bundled compat config, whose only job now is to register
- * {@code BattleGUI} as a known screen of the Cobblemon card: the compat file owns the entry in
- * 模组适配 → Cobblemon → Screen 适配, and ControlFlex fills that page from the actions declared
- * in {@link #onRegisterActions}. Without the file the screen has no owner, so the page cannot be
- * opened and the battle actions have nowhere to be edited.</p>
+ * <p>Installs the bundled compat config, which registers Cobblemon's screens with the Cobblemon
+ * card: {@code BattleGUI}, {@code Summary}, {@code BattleConfigureGUI} and the interaction wheel.
+ * The compat file owns those entries under 模组适配 → Cobblemon → Screen 适配, and ControlFlex
+ * fills each page from the actions declared in {@link #onRegisterActions}. Without the file a
+ * screen has no owner, so its page cannot be opened and its actions have nowhere to be edited.</p>
  */
 public final class CfxCobblemonPlugin implements IControlFlexPlugin {
 
@@ -32,10 +32,10 @@ public final class CfxCobblemonPlugin implements IControlFlexPlugin {
     @Override
     public void onInstallCompatConfigs(ICompatAssetInstaller installer) {
         if (!installer.install(COMPAT_RESOURCE, COMPAT_FILE_NAME)) {
-            LOGGER.warn("[cfx-compat-cobblemon] failed to install {} — BattleGUI will not be listed "
-                            + "under Cobblemon → Screen 适配, so the {} battle actions cannot be "
-                            + "seen or rebound in-game",
-                    COMPAT_FILE_NAME, BattleAction.values().length);
+            LOGGER.warn("[cfx-compat-cobblemon] failed to install {} — the Cobblemon screen pages "
+                            + "will not be listed under Cobblemon → Screen 适配, so the battle, "
+                            + "request and summary actions cannot be rebound per screen",
+                    COMPAT_FILE_NAME);
         }
     }
 
@@ -43,8 +43,11 @@ public final class CfxCobblemonPlugin implements IControlFlexPlugin {
     public void onRegisterActions(IActionRegistrar registrar) {
         BattleActions.register(registrar);
         BattleRequestActions.register(registrar);
-        LOGGER.info("[cfx-compat-cobblemon] declared {} battle actions and {} request actions",
-                BattleAction.values().length, BattleRequestAction.values().length);
+        SummaryActions.register(registrar);
+        LOGGER.info("[cfx-compat-cobblemon] declared {} battle actions, {} request actions and "
+                        + "{} summary actions",
+                BattleAction.values().length, BattleRequestAction.values().length,
+                SummaryAction.values().length);
     }
 
     @Override
@@ -57,16 +60,23 @@ public final class CfxCobblemonPlugin implements IControlFlexPlugin {
         BattleRequestAction request = BattleRequestActions.byId(trigger.actionId());
         if (request != null) {
             BattleRequestHandler.handle(request);
+            return;
+        }
+        SummaryAction summary = SummaryActions.byId(trigger.actionId());
+        if (summary != null) {
+            SummaryActionHandler.handle(summary);
         }
     }
 
     @Override
     public void onControlFlexReady() {
-        LOGGER.info("[cfx-compat-cobblemon] ControlFlex ready; {} battle actions and {} request "
-                        + "actions available",
-                BattleAction.values().length, BattleRequestAction.values().length);
+        LOGGER.info("[cfx-compat-cobblemon] ControlFlex ready; {} battle actions, {} request "
+                        + "actions and {} summary actions available",
+                BattleAction.values().length, BattleRequestAction.values().length,
+                SummaryAction.values().length);
         // The only point where ControlFlex has certainly published its API registries.
         BattleScreenHandler.register();
         BattleRequestScreenHandler.register();
+        SummaryScreenHandler.register();
     }
 }

@@ -3,6 +3,7 @@ package com.ifels.cfx.cobblemon.fabric;
 import com.ifels.cfx.cobblemon.BattleHud;
 import com.ifels.cfx.cobblemon.BattleRequestHud;
 import com.ifels.cfx.cobblemon.BattleTicker;
+import com.ifels.cfx.cobblemon.SummaryHud;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -21,6 +22,7 @@ public final class CfxCobblemonFabric implements ClientModInitializer {
                         (rendered, graphics, mouseX, mouseY, tickDelta) -> {
                             BattleHud.render(graphics, rendered);
                             BattleRequestHud.render(graphics, rendered);
+                            SummaryHud.render(graphics, rendered);
                         }));
     }
 }

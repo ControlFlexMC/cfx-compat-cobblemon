@@ -1,6 +1,7 @@
 # cfx-compat-cobblemon
 
-ControlFlex bridge mod for [Cobblemon](https://modrinth.com/mod/cobblemon) battle screens.
+ControlFlex bridge mod for [Cobblemon](https://modrinth.com/mod/cobblemon) battle, challenge and
+summary screens.
 
 Cobblemon's battle UI is pointer-only: the option tiles are not focusable widgets and only accept
 `mousePrimaryClicked(x, y)`, so a controller has to drag a cursor across the screen for every turn.
@@ -12,7 +13,7 @@ registration and the per-screen handler registry).
 
 ## Actions
 
-All 18 battle actions are declared for `BattleGUI` only, so ControlFlex lists them under
+The 18 battle actions are declared for `BattleGUI` only, so ControlFlex lists them under
 Mods → Cobblemon → Screen 适配 → `BattleGUI` — that page is where they are bound, reset (back to
 the four defaults) or cleared. The same card's 按键绑定 tab lists every action of the mod.
 
@@ -61,6 +62,24 @@ row line up. The level row only exists on pages that offer one — Cobblemon kee
 screen after a cycle to the team page but disables them, so their hints are dropped there along
 with the row. The toggle hint stays bottom-left, like the battle screen's.
 
+## Summary screen
+
+`Summary` (the party summary) gets two actions of its own, scoped to that screen:
+
+| Action | Default | Does |
+| --- | --- | --- |
+| `summary_tab_prev` / `summary_tab_next` | LB / RB | step through the four tabs (Info / Moves / Stats / Marks), wrapping at both ends |
+
+A step presses the tab button itself — the same `onPress` a mouse click runs — so leaving a page
+still saves the active mark, closes the move-swap panel and rebuilds the page content exactly as
+Cobblemon would. The open tab is read from the button's own `isActive` flag, so a tab clicked with
+the mouse is where the next bumper press starts from.
+
+The corner hints are the battle screen's pair: the bottom-left `hud_toggle` hint and the
+bottom-right LB/RB row, the latter labelled "Switch tab". The summary adds no per-widget badges —
+its party slots, moves and buttons are already pointer-clickable, so the two bumpers are the only
+controls without a pointer equivalent.
+
 ## How it works
 
 - **No compile dependency on Cobblemon.** Fabric production jars are intermediary, NeoForge's are
@@ -75,6 +94,9 @@ with the row. The toggle hint stays bottom-left, like the battle screen's.
 - **Hints are drawn by this mod**, not by ControlFlex: `IActionBindingProvider` resolves the bound
   button, its glyph and the controller skin in one call, so a rebind or a controller swap shows up
   on the next frame.
+- **Summary tabs are pressed, not reimplemented.** LB/RB find Cobblemon's own `SummaryTab` buttons
+  in the live widget list and press the one the step lands on, so the page switch keeps Cobblemon's
+  bookkeeping; the open tab is read back from its `isActive` flag.
 
 ## Building
 
